@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const Product = require('./models/product');
 
-
+const scrapers = require('./scrape');
 
 mongoose.Promise = global.Promise;
 
@@ -13,6 +13,10 @@ mongoose.connect('mongodb://localhost/fashionscraper_dev', (error) => {
   };
   console.log('Connected to mongoDB!');
 })
+
+
+await scrapers.scrapeProductPage();
+
 
 /*Product.create({name: 'first', price: '10'}, () => {
   console.log('Product created!');

@@ -4,12 +4,13 @@ const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
   name: String,
-  price: String,
+  originalPrice: String,
+  salePrice: String,
   colors: [{
     color: String,
     sizes: [String], 
   }], 
-  category: String,
+  category: String, // in pcid format, e.g. 5319
   date: Date, 
 }); 
 
