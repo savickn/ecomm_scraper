@@ -21,6 +21,11 @@ const autoScroll = async (document, window) => {
   });
 };
 
+const stringToNumber = (string) => {
+  
+}
+
+
 module.exports = {
   sleep,
   autoScroll, 

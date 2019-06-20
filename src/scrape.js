@@ -5,6 +5,27 @@ const util = require('util');
 
 const { createProduct, updateProduct } = require('./models/Product/product.controller');
 
+const jcrew = require('./logic/jcrew');
+
+
+const testJcrew = async () => {
+  const browser = await puppeteer.launch({headless: false});
+  const page = await browser.newPage();
+  page.on('console', msg => console.log(msg.text()));
+
+  const testJcrewShirt = 'https://www.jcrew.com/ca/p/mens_category/sweaters/pullover/cotton-crewneck-sweater-in-garter-stitch/H6060?bmUID=mJIo.G.&bmLocale=en_CA';
+  
+  //const testBRBlazer = 'https://bananarepublic.gapcanada.ca/browse/product.do?cid=1014860&pcid=1014757&vid=1&pid=382921013';
+  //const testBRShorts = 'https://bananarepublic.gapcanada.ca/browse/product.do?cid=1091405&pcid=1014757&vid=1&pid=266619073';
+  //const testBRPants = 'https://bananarepublic.gapcanada.ca/browse/product.do?cid=1091405&pcid=1014757&vid=1&pid=876745283';
+
+  //await jcrew.scrapeJcrewSale(page);
+  await jcrew.scrapeJcrewProduct(page, testJcrewShirt);
+
+  await browser.close();
+}
+
+
 
 const test = async () => {
   const browser = await puppeteer.launch({headless: false});
@@ -17,9 +38,9 @@ const test = async () => {
   const testBRPants = 'https://bananarepublic.gapcanada.ca/browse/product.do?cid=1091405&pcid=1014757&vid=1&pid=876745283';
 
   //await scrapeProductPage(page, testBRShirt); // working on BR
-  await scrapeProductPage(page, testBRBlazer); // 
+  //await scrapeProductPage(page, testBRBlazer); // working on BR
   //await scrapeProductPage(page, testBRShorts); // mostly working on BR (except full price products)
-  //await scrapeProductPage(page, testBRPants);
+  //await scrapeProductPage(page, testBRPants); // working on BR
 
   await browser.close();
 };
@@ -142,9 +163,9 @@ const scrapeProductPage = async (page, url) => {
       for(let container of colorRadioContainers) {
         // represents the element containing the discounted price
         const discountElement = container.querySelector('div.product-price__highlight');
-        const discountedPrice = discountElement ? discountElement.textContent.trim() : null; 
-        // represents price of that specific color
-        const currentPrice = isDiscounted ? discountedPrice : price;
+        const discountedPrice = discountElement ? Number.parseFloat(discountElement.textContent.trim().match(regex)[0]) : null; 
+        // represents the actual price of that specific color
+        const currentPrice = discountedPrice || numericPrice;
         console.log('\n currentPrice --> ', currentPrice);
 
         // represents each 'color' radio button in the current container
@@ -233,7 +254,7 @@ const scrapeProductPage = async (page, url) => {
                 };
 
                 const lengthSize = lr.getAttribute('value');
-                const size = waistSize + ' x ' + lengthSize;
+                const size = chestSize + ' x ' + lengthSize;
                 console.log('size --> ', size);
                 sizes.push(size);
               };
@@ -256,7 +277,7 @@ const scrapeProductPage = async (page, url) => {
 
       return {
         title,
-        price,
+        // fullPrice: add this
         colors,  
       }; 
     /*} catch(err) {
@@ -268,7 +289,8 @@ const scrapeProductPage = async (page, url) => {
   return result;
 }
 
-test();
+testJcrew();
+//test();
 //scrapeBR();
 //scrapeSaleList();
 //scrapeProductPage();
