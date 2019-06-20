@@ -93,6 +93,8 @@ const scrapeJcrewSale = async (page) => {
   let currentPage = 1;
 
   do {
+    await setTimeout(() => {}, 2000);
+
     const url = salePageString + currentPage;
     await page.goto(url, {waitUntil: 'networkidle2'});
     

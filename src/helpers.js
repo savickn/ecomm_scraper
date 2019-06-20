@@ -22,7 +22,13 @@ const autoScroll = async (document, window) => {
 };
 
 const stringToNumber = (string) => {
-  
+  const regex = /\d+/;
+  return string.match(regex)[0];
+}
+
+const stringToPrice = (string) => {
+  const regex = /\d+\.\d+/;
+  return string.match(regex)[0];
 }
 
 
