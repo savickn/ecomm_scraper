@@ -1,7 +1,7 @@
 
 const mongoose = require('mongoose');
 
-const scrapers = require('./scrape');
+const ProductController = require('../models/Product/product.controller');
 
 mongoose.Promise = global.Promise;
 
@@ -13,15 +13,13 @@ mongoose.connect('mongodb://localhost/fashionscraper_dev', (error) => {
   console.log('Connected to mongoDB!');
 })
 
-(await scrapers.scrapeAll())();
+const sampleData = {
+  url: '',
+  name: '',
+  currentPrice: '', 
+  originalPrice: '', 
 
-
-/*Product.create({name: 'first', price: '10'}, () => {
-  console.log('Product created!');
-});*/
-
-
-
+};
 
 
 

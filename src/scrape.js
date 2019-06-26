@@ -3,14 +3,14 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 const util = require('util');
 
-const { createProduct, updateProduct } = require('./models/Product/product.controller');
+const br = require('./scrapers/br');
+const gap = require('./scrapers/gap');
+const jcrew = require('./scrapers/jcrew');
 
+const ProductController = require('./models/Product/product.controller');
 
-
-const scrapeAll = async () => { }
-
-const scrapeBR = async () => {
-  const browser = await puppeteer.launch({headless: false});
+const scrapeAll = async () => {
+  const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
   page.on('console', msg => {
     console.log(msg.text());
@@ -19,25 +19,148 @@ const scrapeBR = async () => {
     }*/
   });
 
+  await scrapeBR(page);
+  //await scrapeGAP(page);
+  //await scrapeON(page);
+  //await scrapeJC(page);
+}
+
+const scrapeBR = async (page) => {
   // scrape current promotions from home page
 
 
   // scrape links from sale page
-  const links = await scrapeSaleList(page);
+  const links = await br.scrapeBananaSale(page);
 
   // scrape price/colors/sizes from product pages
-  for(let link of links) {
+  for(let l of links) {
     // add 'sleep' between iterations
-    let productData = await scrapeProductPage(page, url)
+    let productData = await br.scrapeBananaProduct(page, l);
+    await ProductController.createProduct(productData);
+  }
+}
+
+const scrapeGAP = async () => {
+  // scrape current promotions from home page
+
+
+  // scrape links from sale page
+  const links = await gap.scrapeGapSale(page);
+
+  // scrape price/colors/sizes from product pages
+  for(let l of links) {
+    // add 'sleep' between iterations
+    let productData = await gap.scrapeGapProduct(page, l);
     // create Product entry in MongoDB for scraped product
   }
 }
-const scrapeGAP = async () => { }
-const scrapeON = async () => { }
-const scrapeJC = async () => { }
+
+const scrapeJC = async () => {
+  // scrape current promotions from home page
 
 
-const scrapeSaleList = async (page) => {
+  // scrape links from sale page
+  const links = await jcrew.scrapeJcrewSale(page);
+
+  // scrape price/colors/sizes from product pages
+  for(let l of links) {
+    // add 'sleep' between iterations
+    let productData = await jcrew.scrapeJcrewProduct(page, l)
+    // create Product entry in MongoDB for scraped product
+  }
+}
+
+//testJcrew();
+//test();
+//scrapeBR();
+//scrapeSaleList();
+//scrapeProductPage();
+
+module.exports = {
+  scrapeAll,
+  scrapeBR,
+  scrapeGAP,
+  scrapeJC, 
+}
+
+
+/* Product Page Logic */
+
+//await page.screenshot({path: path.resolve('output', 'example.png')});
+//await page.pdf({path: path.resolve('output', 'hn.pdf'), format: 'A4'});
+
+/*const images = [...document.querySelectorAll('img.swatches--image')];
+const imageNames = images.map((img) => {
+  return img.getAttribute('alt');
+})*/
+
+  //const colorRadios = [...document.querySelectorAll('input.swatch__radio')];
+  
+  // should contain entries for each color and subcategories for price/sizes
+  /*const colors = colorRadios.map((cr) => {
+    const colorName = cr.getAttribute('value');
+    cr.click();
+
+    const sizeRadios = [...document.querySelectorAll('input.swatches--radio')]
+    const sizes = sizeRadios.map((sr) => {
+      return sr.getAttribute('value');  //sr.textContent.trim();
+    })
+
+    return {
+      colorName,
+      // colorPrice, 
+      sizes, 
+    };
+  });*/
+
+  /*const sizeRadios = [...document.querySelectorAll('input.swatches--radio')]
+  const sizes = sizeRadios.map((sr) => {
+    return sr.getAttribute('value');  //sr.textContent.trim();
+  });*/
+
+    /*const t = await page.$('h1.product-title');
+  const p = await page.$('h5.product-price');
+  const ps = await page.$('span.product-price--highlight');
+  console.log('title --> ', t.toString());*/
+
+
+  /*console.log('waistSection attrs --> ', JSON.stringify(waistSection.attributes));
+        const wsJson = await waistSection.jsonValue();
+        console.log('waistSection json --> ', wsJson);
+        const wsProperties = await waistSection.getProperties();
+        console.log('waistSection properties --> ', wsProperties);*/
+
+  /*for(let c of colorRadioContainers) {
+      console.log('container --> ', c);
+      //console.log('container asElement --> ', c.asElement());
+      console.log('container attrs --> ', JSON.stringify(c.attributes));
+
+      const cJson = await c.jsonValue(); 
+      console.log('container json --> ', cJson); 
+
+      const cProps = await c.getProperties();
+      console.log('container properties --> ', cProps);
+    }; */
+
+  /*const c = result.colors[4];
+    console.log('\n \n ', c.colorName);
+    c.sizes.forEach((size) => {
+      console.log(size);
+    });*/
+
+  /* Sale List Logic */
+
+  /*const p = await page.$('div.product-card');
+  console.log('product --> ', p);
+  console.log('product json --> ', await p.jsonValue());
+  console.log('product string --> ', p.toString());
+  console.log('product props --> ', await p.getProperties());*/
+
+
+
+/* Basic Scrapers */
+
+/*const scrapeSaleList = async (page) => {
   const salePageString = 'https://bananarepublic.gapcanada.ca/browse/category.do?cid=1014757'; 
   await page.goto(salePageString, {waitUntil: 'networkidle2'});
 
@@ -111,10 +234,10 @@ const scrapeProductPage = async (page, url) => {
       const numericPrice = Number.parseFloat(stringPrice.match(regex)[0]);
       console.log('numericPrice --> ', numericPrice);
       
-      /*const priceString = document.querySelector('span.product-price--highlight').textContent.trim()
+      const priceString = document.querySelector('span.product-price--highlight').textContent.trim()
       console.log('\n priceString --> ', priceString);
       const isDiscounted = priceString.length > 0;
-      console.log('\n isDiscounted --> ', isDiscounted);*/
+      console.log('\n isDiscounted --> ', isDiscounted);
 
       // represents all colors on the page
       let colors = [];
@@ -242,96 +365,7 @@ const scrapeProductPage = async (page, url) => {
         // fullPrice: add this
         colors,  
       }; 
-    /*} catch(err) {
-      console.error(err);
-      return err;
-    }*/
   });
   console.log('result --> ', result);
   return result;
-}
-
-//testJcrew();
-//test();
-//scrapeBR();
-//scrapeSaleList();
-//scrapeProductPage();
-
-module.exports = {
-  scrapeProductPage,
-  //scrapeHomePage,
-  scrapeSaleList, 
-}
-
-
-/* Product Page Logic */
-
-//await page.screenshot({path: path.resolve('output', 'example.png')});
-//await page.pdf({path: path.resolve('output', 'hn.pdf'), format: 'A4'});
-
-/*const images = [...document.querySelectorAll('img.swatches--image')];
-const imageNames = images.map((img) => {
-  return img.getAttribute('alt');
-})*/
-
-  //const colorRadios = [...document.querySelectorAll('input.swatch__radio')];
-  
-  // should contain entries for each color and subcategories for price/sizes
-  /*const colors = colorRadios.map((cr) => {
-    const colorName = cr.getAttribute('value');
-    cr.click();
-
-    const sizeRadios = [...document.querySelectorAll('input.swatches--radio')]
-    const sizes = sizeRadios.map((sr) => {
-      return sr.getAttribute('value');  //sr.textContent.trim();
-    })
-
-    return {
-      colorName,
-      // colorPrice, 
-      sizes, 
-    };
-  });*/
-
-  /*const sizeRadios = [...document.querySelectorAll('input.swatches--radio')]
-  const sizes = sizeRadios.map((sr) => {
-    return sr.getAttribute('value');  //sr.textContent.trim();
-  });*/
-
-    /*const t = await page.$('h1.product-title');
-  const p = await page.$('h5.product-price');
-  const ps = await page.$('span.product-price--highlight');
-  console.log('title --> ', t.toString());*/
-
-
-  /*console.log('waistSection attrs --> ', JSON.stringify(waistSection.attributes));
-        const wsJson = await waistSection.jsonValue();
-        console.log('waistSection json --> ', wsJson);
-        const wsProperties = await waistSection.getProperties();
-        console.log('waistSection properties --> ', wsProperties);*/
-
-  /*for(let c of colorRadioContainers) {
-      console.log('container --> ', c);
-      //console.log('container asElement --> ', c.asElement());
-      console.log('container attrs --> ', JSON.stringify(c.attributes));
-
-      const cJson = await c.jsonValue(); 
-      console.log('container json --> ', cJson); 
-
-      const cProps = await c.getProperties();
-      console.log('container properties --> ', cProps);
-    }; */
-
-  /*const c = result.colors[4];
-    console.log('\n \n ', c.colorName);
-    c.sizes.forEach((size) => {
-      console.log(size);
-    });*/
-
-  /* Sale List Logic */
-
-  /*const p = await page.$('div.product-card');
-  console.log('product --> ', p);
-  console.log('product json --> ', await p.jsonValue());
-  console.log('product string --> ', p.toString());
-  console.log('product props --> ', await p.getProperties());*/
+}*/

@@ -21,15 +21,17 @@ const autoScroll = async (document, window) => {
   });
 };
 
+// used to extract an integer from a string
 const stringToNumber = (string) => {
   const regex = /\d+/;
   return string.match(regex)[0];
-}
+};
 
+// used to extract a float from a string (can be used as price/etc)
 const stringToPrice = (string) => {
   const regex = /\d+\.\d+/;
   return string.match(regex)[0];
-}
+};
 
 
 module.exports = {

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node ./src/test.js",
+    "testdb": "node ./src/tests/db.js", 
     "start": "node ./src/scrape.js"
   },
   "author": "Nicholas Savickas",
