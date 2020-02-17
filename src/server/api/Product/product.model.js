@@ -2,6 +2,25 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+/* 
+Categories:
+* Shirt
+* Dress Shirt
+* Polo
+* Jacket
+* Henley
+* Sweater
+* Chino
+* Pant
+* Jean
+* Blazer
+* Suit Jacket
+* Coat
+* Parka 
+
+
+*/
+
 const ProductSchema = new Schema({
   url: String, 
   name: String,
@@ -18,9 +37,15 @@ const ProductSchema = new Schema({
   }], 
 
   // extra info
-  site: String, // e.g. BR/GAP
-  category: String, // e.g. Blazer/Jeans/Shorts
+  brand: String, // e.g. BR/GAP
+  keywords: [String], // almost anything --> e.g. wool/turtleneck/skinny/slim/etc
   // color: String, // if separating colors from product
+  
+
+  // SearchBy:
+  // category: String, --> e.g. Sweater/Blazer
+  // subcategory: String, --> crewneck/turtleneck
+  // materials: String, --> e.g. Denim, Corduroy, 
 
   // extra features
   onSale: Boolean, // used to determine if Promotion applies

@@ -57,14 +57,14 @@ class SearchBar extends React.Component {
   // for checkbox options, WORKING
   handleCheckboxChange = (name, arr) => {
     console.log('searchBar handleCheckboxChange --> ', name, arr);
-    const searchObj = Object.assign({}, this.state.search, { [name]: arr })
+    const searchObj = Object.assign({}, this.state.search, { [name.toLowerCase()]: arr })
     this.setState({search: searchObj});
   }
 
                               /* SORTING */
 
   handleSortOptionSelected = () => {
-
+    
   }
 
                               /* SEARCH */

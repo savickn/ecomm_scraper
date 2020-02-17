@@ -65,6 +65,8 @@ const searchProducts = (req, res) => {
   // add all-time-low + 12-week-low filters
   // add 5% from all-time-low filter
 
+  console.log('searchObj --> ', searchObj);
+
   Product.count(searchObj, (err, count) => {
     if(err) return res.status(501).send(err);
 
@@ -109,35 +111,13 @@ const getProduct = (req, res) => {
 ** Used to add/update product entry
 */
 const upsertProduct = (data) => {
-  console.log('upsert data --> ', data);
   if(!data.url || !data.name || !data.pid) {
     console.error('Invalid arguments!');
     return;
   }
 
-  Product.findOne({ pid: data.pid }).then((product) => {
-    console.log('upsert lookup --> ', product);
-    
-    // create new product db entry
-    if(!product) {
-      return Product.create(data).then((product) => {
-        console.log('product --> ', product);
-        return product;
-      }).catch((err) => {
-        console.error('Unable to create Product. Error --> ', err);
-        throw err;
-      });
-
-    // update existing product db entry
-    } else {
-      product.priceHistory.push(data.priceHistory[0]);
-      return product.save().then((product) => {
-        console.log('Successfully updated Product.');
-      }).catch((err) => {
-        console.error('Unable to update Product. Error --> ', err);
-        throw err;
-      });
-    }
+  return Product.findOneAndUpdate({ pid: data.pid }, data, { new: true, runValidators: true, upsert: true }).then((product) => {
+    console.log('\n Success! Updated Product --> ', product);
   }).catch((err) => {
     console.error('Unable to locate product. Error --> ', err);
     throw err;
@@ -192,4 +172,44 @@ module.exports = {
     throw err;
   });
 }*/
+
+
+/*
+** Used to add/update product entry, OLD BUT WORKING
+*/
+/*const upsertProduct = (data) => {
+  if(!data.url || !data.name || !data.pid) {
+    console.error('Invalid arguments!');
+    return;
+  }
+
+  return Product.findOne({ pid: data.pid }).then((product) => {
+    console.log('upsert lookup --> ', product);
+    
+    // create new product db entry
+    if(!product) {
+      return Product.create(data).then((product) => {
+        console.log('product --> ', product);
+        return product;
+      }).catch((err) => {
+        console.error('Unable to create Product. Error --> ', err);
+        throw err;
+      });
+
+    // update existing product db entry
+    } else {
+      product.priceHistory.push(data.priceHistory[0]);
+      return product.save().then((product) => {
+        console.log('Successfully updated Product.');
+      }).catch((err) => {
+        console.error('Unable to update Product. Error --> ', err);
+        throw err;
+      });
+    }
+  }).catch((err) => {
+    console.error('Unable to locate product. Error --> ', err);
+    throw err;
+  })
+};*/
+
 

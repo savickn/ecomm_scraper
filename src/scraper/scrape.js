@@ -7,6 +7,7 @@ const br = require('./logic/br');
 const gap = require('./logic/gap');
 const jcrew = require('./logic/jcrew');
 
+const analytics = require('./logic/analytics');
 const helpers = require('./logic/helpers');
 const ProductController = require('../server/api/Product/product.controller');
 //import * as ProductController from '../server/api/Product/product.controller';
@@ -17,34 +18,21 @@ const scrapeAll = async () => {
   const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
   
-  //page.on('console', msg => {
- //   console.log(msg.text());
-    /*for (let i = 0; i < msg.args().length; i++) {
+  /* write logs to shell console instead of browser console
+  page.on('console', msg => {
+    console.log(msg.text());
+    for (let i = 0; i < msg.args().length; i++) {
       console.log(msg.args()[i]);
-    }*/
-//  });
+    }
+  }); */
 
-  await scrapeBR(page);
-  //await scrapeGAP(page);
+  //await scrapeBR(page);
+  await scrapeGAP(page);
   //await scrapeON(page);
   //await scrapeJC(page);
 }
 
 const scrapeBR = async (page) => {
-  /*
-  ** TEST
-  */
-    
-  /*const links = [
-    'https://bananarepublic.gapcanada.ca/browse/product.do?cid=1113632&pcid=32643&vid=1&pid=488743003',
-    'https://bananarepublic.gapcanada.ca/browse/product.do?cid=1113632&pcid=32643&vid=1&pid=512819003', 
-    'https://bananarepublic.gapcanada.ca/browse/product.do?cid=1146838&pcid=32643&vid=1&pid=488697003', 
-  ];*/
-
-  /*
-  ** PRODUCTION
-  */
-  
   // scrape current promotions from home page
   // NOT IMPLEMENTED 
 
@@ -57,32 +45,24 @@ const scrapeBR = async (page) => {
 
 const scrapeGAP = async (page) => {
   // scrape current promotions from home page
-
+  // NOT IMPLEMENTED
 
   // scrape links from sale page
   const links = await gap.scrapeGapSale(page);
 
   // scrape price/colors/sizes from product pages
-  for(let l of links) {
-    // add 'sleep' between iterations
-    let productData = await gap.scrapeGapProduct(page, l);
-    // create Product entry in MongoDB for scraped product
-  }
+  await scrapeProduct(page, links, gap.scrapeGapProduct);
 }
 
 const scrapeJC = async () => {
   // scrape current promotions from home page
-
+  // NOT IMPLEMENTED
 
   // scrape links from sale page
   const links = await jcrew.scrapeJcrewSale(page);
 
   // scrape price/colors/sizes from product pages
-  for(let l of links) {
-    // add 'sleep' between iterations
-    let productData = await jcrew.scrapeJcrewProduct(page, l)
-    // create Product entry in MongoDB for scraped product
-  }
+  await scrapeProduct(page, links, jcrew.scrapeJcrewProduct);
 }
 
 
@@ -92,11 +72,15 @@ const scrapeProduct = async (page, links, scraper) => {
     await helpers.sleep(2500);
 
     let productData = await scraper(page, l);
-    console.log('productData --> ', productData);
+    console.log('\n productData --> ', productData);
+
+    // guard against empty objects
+    if(!productData.title) continue;
 
     let product = {
       url: l, 
-      name: productData.title, 
+      name: productData.title,
+      brand: productData.brand,  
       pid: productData.pid, 
       pcid: productData.pcid, 
       priceHistory: [{
@@ -104,6 +88,9 @@ const scrapeProduct = async (page, links, scraper) => {
         colors: productData.colors, 
       }],  
     };
+
+    product.keywords = analytics.analyzeKeywords(product); // populate category field
+    console.log('\n scrapeProduct finalProduct --> ', product);
 
     await ProductController.upsertProduct(product);
   }

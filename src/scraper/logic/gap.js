@@ -1,9 +1,17 @@
 
+
 const scrapeGapProduct = async (page, url) => {
   await page.goto(url);
 
   const result = await page.evaluate(() => {
-    //try {
+    try {
+
+      const url = document.location.href;
+      const urlParams = new URLSearchParams(window.location.search);
+
+      const pid = urlParams.get('pid');
+      const pcid = urlParams.get('pcid');
+
       // represents the product's name
       const title = document.querySelectorAll('h1.product-title')[0].textContent.trim();
       // represents the product's default price (usually full price unless all varieties are discounted)
@@ -138,18 +146,21 @@ const scrapeGapProduct = async (page, url) => {
         // merges colors from current container with the page-wide color collection
         colors = [...colors, ...interColors];
       };
+      
 
       return {
         title,
+        pid, 
+        pcid, 
+        brand: 'GAP', 
         // fullPrice: add this
         colors,  
       }; 
-    /*} catch(err) {
+    } catch(err) {
       console.error(err);
       return err;
-    }*/
+    }
   });
-  console.log('result --> ', result);
   return result;
 }
 

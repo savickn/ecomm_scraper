@@ -1,7 +1,6 @@
 
 const helpers = require('./helpers');
 
-
 const scrapeBananaSale = async (page, site) => {
   let salePageString = '';
   
@@ -233,17 +232,19 @@ const scrapeBananaProduct = async (page, url) => {
         title,
         pid, 
         pcid, 
+        brand: 'BR', 
+        //category: 
         // fullPrice: add this
         colors,  
       }; 
     } catch(err) {
       console.error(err);
-      //return err;
+      return err;
     }
   });
-  console.log('result --> ', result);
   return result;
 }
+
 
 module.exports = {
   scrapeBananaSale, 
