@@ -6,7 +6,7 @@ import * as controller from './product.controller';
 const router = new Router();
 
 router.get('/', controller.searchProducts); 
-router.get('/:id', controller.getProduct); 
+router.get('/:pid', controller.getProduct); 
 
 export default router;
 

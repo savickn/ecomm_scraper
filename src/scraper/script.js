@@ -23,9 +23,9 @@ mongoose.connect('mongodb://localhost/fashionscraper_dev')
     logger.log('info', 'Connected to mongoDB!');
     
     try {
-      //await scraperTests.testAll();
+      await scraperTests.testAll();
       
-      await scrapers.scrapeAll();
+      //await scrapers.scrapeAll();
       //await scrapers.scrapePromos();
       //await promoScraper.scrapeAllPromos();
       //mongoose.connection.close(); // throws error 'Topology was destroyed'

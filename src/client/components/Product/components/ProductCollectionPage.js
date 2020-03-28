@@ -8,8 +8,8 @@ import { connect } from 'react-redux';
 */
 
 import ProductElement from './ProductElement';
-import SearchBar from '../../SearchBar/SearchBar';
-import Pagination from '../../Pagination/Pagination';
+import SearchBar from '../../Utility/SearchBar/SearchBar';
+import Pagination from '../../Utility/Pagination/Pagination';
 
 /*
 ** Reducers

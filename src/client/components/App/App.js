@@ -11,8 +11,8 @@ import DevTools from '../../util/devTools';
 import Header from './components/Header/Header';
 
 /*import Footer from './components/Footer/Footer';
-import Alert from '../Alert/alert';
-import Spinner from '../Spinner/spinkit';*/
+import Alert from '../Utility/Alert/alert';
+import Spinner from '../Utility/Spinner/spinkit';*/
 
 
 /*

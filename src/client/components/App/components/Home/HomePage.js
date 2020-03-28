@@ -15,7 +15,7 @@ class HomePage extends React.Component {
     return (
       <div>
         <div className={styles.red}>
-          Welcome to TheSocialSpot. <span className='background_blue'>Please 'log in' above to get started. </span>
+          Welcome! <span className='background_blue'>Please 'log in' above to get started. </span>
         </div>
         <Link to='/products'>Products</Link>
       </div>

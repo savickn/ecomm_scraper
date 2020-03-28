@@ -1,5 +1,6 @@
 
 const Product = require('./product.model');
+const Price = require('../PriceHistory/price.model');
 const _ = require('lodash');
 
 /*
@@ -87,10 +88,10 @@ const searchProducts = (req, res) => {
         if(err) return res.status(501).send(err);
 
         // should filter 'priceHistory' for most recent price here or at client???
-        products = products.map((val) => {
+        /*products = products.map((val) => {
           val.priceHistory = val.priceHistory[val.priceHistory.length - 1];
           return val;
-        });
+        });*/
 
         return res.status(200).json({products, count});
     });
@@ -101,9 +102,12 @@ const searchProducts = (req, res) => {
 ** get one product with full priceHistory
 */
 const getProduct = (req, res) => {
-  Product.findById(req.params.id, (err, product) => {
-    if(err) return res.status(401).send(err);
-    return res.status(200).json({product});
+  Product.findOne({ 'pid': req.params.pid })
+    .populate('history', Price)
+    .exec((err, product) => {
+      console.log(err, '\n \n', product);
+      if(err) return res.status(401).send(err);
+      return res.status(200).json({ product });
   })
 }
 
@@ -117,10 +121,11 @@ const upsertProduct = (data) => {
   }
 
   return Product.findOneAndUpdate({ pid: data.pid }, data, { new: true, runValidators: true, upsert: true }).then((product) => {
-    console.log('\n Success! Updated Product --> ', product);
+    //console.log('\n Success! Updated Product --> ', product);
+    return product;
   }).catch((err) => {
     console.error('Unable to locate product. Error --> ', err);
-    throw err;
+    return err;
   })
 };
 

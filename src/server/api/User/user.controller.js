@@ -7,29 +7,6 @@ import _ from 'lodash';
 import config from '../../config/environment';
 import User from './user.model';
 
-export const getUsers = (req, res) => {
-  console.log('getUsers query --> ', req.query);
-  let query = req.query || {};
-
-  // if groupId
-  // if eventId
-
-  User.count(query, function(err, count) {
-    if(err) return handleError(err);
-    User.find(query, function(err, users) {
-      if(err) return handleError(err);
-      return res.status(200).json({users, count});
-    });
-  })
-};
-
-export const getUser = (req, res) => {
-  User.findById(req.params._id, function(err, user) {
-    if(err) return res.status(500).send(err);
-    return res.status(200).json(user);
-  })
-};
-
 
 /* Used to create a new database entry for a User (also returns JWT for auth... is this best practise??)
 *  Password
@@ -71,13 +48,10 @@ export const getMe = (req, res) => {
   });
 };
 
+// used to delete an account
 export const deleteUser = (req, res) => {
   User.findOneAndRemove({_id: req.params._id}, function(err, user) {
     if (err) return res.status(500).send(err);
     return res.status(200).end();
   });
 };
-
-function handleError(err) {
-  return res.status(500).send(err);
-}

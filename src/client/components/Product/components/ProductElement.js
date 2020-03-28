@@ -27,10 +27,10 @@ class ProductElement extends React.Component {
     return product ? (
       <div className={styles.productFlexItem}>
         <img src={img} width='200' height='200' />
-        <a href={product.url}>{product.name}</a>
-
+        <Link to={`products/${product.pid}`}>{product.name}</Link>
+        <a href={product.url}> Buy Now! </a>
       </div>
-    ) : <div>Nothing</div>;
+    ) : <div></div>;
   }
 }
 

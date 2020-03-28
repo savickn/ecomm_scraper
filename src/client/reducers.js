@@ -4,9 +4,10 @@ import app from './components/App/AppReducer';
 import account from './components/User/AccountReducer';
 import users from './components/User/UserReducer';
 import products from './components/Product/ProductReducer';
+import prices from './components/Product/PriceReducer';
 
-import alerts from './components/Alert/alertReducer';
-import modal from './components/Modal/modalReducer';
+import alerts from './components/Utility/Alert/alertReducer';
+import modal from './components/Utility/Modal/modalReducer';
 
 /*
 ** return list of Reducers which will be combined 
@@ -18,6 +19,7 @@ let reducers = {
   account,
   alerts, 
   products, 
+  prices, 
   modal, 
 };
 

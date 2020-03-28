@@ -24,27 +24,24 @@ Categories:
 const ProductSchema = new Schema({
   url: String, 
   name: String,
+  color: String, // name of color
+  fullPrice: String, // regular price
+  currentPrice: String, // current price (e.g. can be the same as fullPrice or can be a discounted price)
   pid: String, // in pid format, e.g. ???
   pcid: String, // category, in pcid format, e.g. 5319
-  priceHistory: [{
-    date: Date,
-    colors: [{
-      colorName: String,
-      originalPrice: String, // represents the original price
-      currentPrice: String, // represents the price at the time of scraping
-      sizes: [String], 
-    }], 
-  }], 
-
-  // extra info
   brand: String, // e.g. BR/GAP
   keywords: [String], // almost anything --> e.g. wool/turtleneck/skinny/slim/etc
-  // color: String, // if separating colors from product
-  
+  imageSrc: String, // src string for product image (e.g. shirt)
+  colorSrc: String, // src string for color thumbnail 
+  sizes: [String], 
+  history: [{ // --> tracks price changes
+    type: Schema.Types.ObjectId,
+    ref: 'Price', 
+  }], 
 
-  // SearchBy:
+  // keywords include:
   // category: String, --> e.g. Sweater/Blazer
-  // subcategory: String, --> crewneck/turtleneck
+  // variety: String, --> crewneck/turtleneck
   // materials: String, --> e.g. Denim, Corduroy, 
 
   // extra features
@@ -64,3 +61,38 @@ ProductSchema.virtual('currentDiscount').get(() => {
 //ProductSchema.set({'toJSON': true});
 
 module.exports = mongoose.model('Product', ProductSchema);
+
+
+
+
+
+
+
+
+  /* ALTERNATIVE
+  colors: [{
+    color: String, 
+    sizes: [String], 
+    history: [{
+      date: Date, 
+      salePrice: String, // sale price (pre site-wide promotions)
+    }], 
+
+    OR 
+
+    history: [{
+      type: Schema.Types.ObjectId,
+      ref: 'PriceHistory', 
+    }], 
+  }], */
+
+  /* OLD
+  priceHistory: [{
+    date: Date,
+    colors: [{
+      colorName: String,
+      originalPrice: String, // represents the original price
+      currentPrice: String, // represents the price at the time of scraping
+      sizes: [String], 
+    }], 
+  }], */

@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Spinner from 'react-spinkit';
 
-import { isLoading } from '../App/AppReducer';
+import { isLoading } from '../../App/AppReducer';
 
 import styles from './spinkit.scss';
 

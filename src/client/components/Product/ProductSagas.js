@@ -1,15 +1,21 @@
 
-import { takeLatest, call, put, fork } from "redux-saga/effects";
+import { takeLatest, call, put, fork } from 'redux-saga/effects';
 import { push } from 'connected-react-router';
 
 import axios from '../../util/axiosCaller';
 import { getDifferenceInDays } from '../../util/DateUtil';
 
 import {
-  SEARCH_PRODUCTS_REQUEST,
-  searchProductsSuccess, 
-  searchProductsError, 
-} from './ProductActions';
+  SEARCH_PRODUCTS_REQUEST, FETCH_PRODUCT_REQUEST, 
+  searchProductsSuccess, fetchProductSuccess, 
+  searchProductsError, fetchProductError, 
+} from './ProductActions'; 
+
+import {
+  FETCH_PRICES_REQUEST, 
+  fetchPricesSuccess, 
+  fetchPricesError, 
+} from './PriceActions'; 
 
 
 /* 
@@ -56,7 +62,8 @@ function checkLocalStorage(search, pagination) {
 ** API Requests
 */
 
-function fetchProducts(search={}, pagination={}) {
+// get Products based on search criteria
+function searchProducts(search={}, pagination={}) {
   return axios.get('api/products/', {
     params: {
       search,
@@ -67,18 +74,32 @@ function fetchProducts(search={}, pagination={}) {
   .catch((err) => { throw err; })
 }
 
+// get PriceHistory for a specific Product... NOT WORKING/FINISHED
+function fetchPrices(productId) {
+  return axios.get()
+    .then((res) => res.data)
+    .catch((err) => { throw err; })
+}
+
+// get all data for specific Product
+function fetchProduct(productId) {
+  return axios.get(`/api/products/${productId}`)
+    .then((res) => res.data)
+    .catch((err) => { throw err; })
+}
+
 /* 
 ** SEARCH PRODUCTS 
 */
 
-export function* fetchProductsWatcher() {
-  yield takeLatest(SEARCH_PRODUCTS_REQUEST, fetchProductsHandler);
+export function* searchProductsWatcher() {
+  yield takeLatest(SEARCH_PRODUCTS_REQUEST, searchProductsHandler);
 }
 
-export function* fetchProductsHandler(action) {
+export function* searchProductsHandler(action) {
   try {
     //const { freshSearch, freshPagination } = checkLocalStorage(action.payload.search, action.payload.pagination);
-    const res = yield call(fetchProducts, action.payload.search, action.payload.pagination);
+    const res = yield call(searchProducts, action.payload.search, action.payload.pagination);
     console.log('fetchProducts res --> ', res);
     yield put(searchProductsSuccess(res.products, res.count));
   } catch(error) {
@@ -88,9 +109,50 @@ export function* fetchProductsHandler(action) {
 }
 
 /*
+** GET PRODUCT
+*/
+
+export function* fetchProductWatcher() {
+  yield takeLatest(FETCH_PRODUCT_REQUEST, fetchProductHandler);
+}
+
+export function* fetchProductHandler(action) {
+  try {
+    const res = yield call(fetchProduct, action.productId);
+    console.log('fetchProduct res --> ', res);
+    yield put(fetchProductSuccess(res.product));
+  } catch(error) {
+    console.log('fetchProduct error --> ', error);
+    yield put(fetchProductError(error));
+  }
+}
+
+
+/*
+** GET PRICE HISTORY
+*/
+
+export function* fetchPricesWatcher() {
+  yield takeLatest(FETCH_PRICES_REQUEST, fetchPricesHandler);
+}
+
+export function* fetchPricesHandler(action) {
+  try {
+    const res = yield call(fetchPrices, action.productId);
+    console.log('fetchPrices res --> ', res);
+    yield put(fetchPricesSuccess(res.prices, action.productId));
+  } catch(error) {
+    console.log('fetchPrices error --> ', error);
+    yield put(fetchPricesError(error));
+  }
+}
+
+/*
 ** Export Watchers
 */
 
 export default [
-  fork(fetchProductsWatcher),
+  fork(searchProductsWatcher),
+  fork(fetchProductWatcher), 
+  //fork(fetchPricesWatcher),
 ];

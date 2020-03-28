@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Route, Redirect } from 'react-router-dom';
 
-import { isAuthenticated, hasRole, isCorrectUser, getAccountStatus } from '../User/AccountReducer';
+import { isAuthenticated, hasRole, isCorrectUser, getAccountStatus } from '../../User/AccountReducer';
 
 /* Auth Types: 
 * Must be Admin (easy, working)

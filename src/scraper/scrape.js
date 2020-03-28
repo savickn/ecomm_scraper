@@ -10,6 +10,7 @@ const jcrew = require('./logic/jcrew');
 const analytics = require('./logic/analytics');
 const helpers = require('./logic/helpers');
 const ProductController = require('../server/api/Product/product.controller');
+const HistoryController = require('../server/api/PriceHistory/price.controller');
 //import * as ProductController from '../server/api/Product/product.controller';
 
 
@@ -72,7 +73,7 @@ const scrapeProduct = async (page, links, scraper) => {
     await helpers.sleep(2500);
 
     let productData = await scraper(page, l);
-    console.log('\n productData --> ', productData);
+    //console.log('\n productData --> ', productData);
 
     // guard against empty objects
     if(!productData.title) continue;
@@ -80,19 +81,30 @@ const scrapeProduct = async (page, links, scraper) => {
     let product = {
       url: l, 
       name: productData.title,
-      brand: productData.brand,  
+      //fullPrice
       pid: productData.pid, 
       pcid: productData.pcid, 
-      priceHistory: [{
-        date: Date.now(), 
-        colors: productData.colors, 
-      }],  
+      brand: productData.brand,  
+      keywords: analytics.analyzeKeywords(productData.title), 
+      colors: productData.colors, 
     };
 
-    product.keywords = analytics.analyzeKeywords(product); // populate category field
-    console.log('\n scrapeProduct finalProduct --> ', product);
+    //console.log('\n scrapeProduct finalProduct --> ', product);
 
-    await ProductController.upsertProduct(product);
+    let newProduct = await ProductController.upsertProduct(product);
+
+    console.log('\n scrapeProduct newProduct --> ', newProduct);
+
+    // now create priceHistory
+    for(let color of productData.colors) {
+      const colorObj = {
+        ...color,
+        date: Date.now(), 
+        productId: newProduct._id, 
+      }
+      console.log('color --> ', colorObj);
+      HistoryController.savePrice(colorObj);
+    }
   }
 }
 

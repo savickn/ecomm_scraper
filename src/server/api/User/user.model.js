@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const authTypes = ['github', 'twitter', 'facebook', 'google'];
 
-export const UserSchema = new Schema({
+const UserSchema = new Schema({
   name: {
     type: String,
     required: true
@@ -15,20 +15,10 @@ export const UserSchema = new Schema({
     lowercase: true,
     match: [/[A-Za-z0-9]+@([A-Za-z])+(\.[A-Za-z]+)+/, "This email address is not in the correct format. Please enter an email address in the following format: 'example@example.com'."],
   },
-  bio: {
-    type: String,
-  },
-  interests: [{
-    type: String
-  }],
-  groups: [{
+  watchlist: [{
     type: Schema.Types.ObjectId,
-    ref: 'Membership',
-  }],
-  events: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Event',
-  }],
+    ref: 'Watch'
+  }], 
 
   // Authentication
   hashedPassword: String,
@@ -90,6 +80,9 @@ UserSchema.pre('save', function(next) {
 });
 
 UserSchema.pre('remove', (next) => {
+  // remove watches
+  //mongoose.model('Watch').
+  
   next();
 })
 

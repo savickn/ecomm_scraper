@@ -44,11 +44,9 @@ let categories = [
 ];
 
 
-const analyzeKeywords = (data) => {
-  const str = data.name;
-
-  const keywords = str.split(/-|\s/);
-  console.log('keywords --> ', keywords);
+const analyzeKeywords = (txt) => {
+  const keywords = txt.split(/-|\s/);
+  //console.log('keywords --> ', keywords);
 
   // make entry into pcid-category map
 

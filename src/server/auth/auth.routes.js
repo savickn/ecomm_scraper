@@ -4,7 +4,7 @@ import express from 'express';
 import passport from 'passport';
 const LocalStrategy = require('passport-local').Strategy;
 
-import User from '../api/user/user.model';
+import User from '../api/User/user.model';
 import { signToken } from './auth.service';
 
 passport.use('local-auth', new LocalStrategy({

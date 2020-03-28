@@ -95,30 +95,42 @@ const scrapeBananaProduct = async (page, url) => {
       const pid = urlParams.get('pid');
       const pcid = urlParams.get('pcid');
 
-      const title = document.querySelectorAll('h1.product-title')[0].textContent.trim(); // product name
-      const stringPrice = document.querySelectorAll('h5.product-price')[0].textContent.trim(); // represents the product's default price (usually full price unless all varieties are discounted)
-      console.log('stringPrice --> ', stringPrice);
-      const regex = /\d+\.\d+/;
-      const numericPrice = Number.parseFloat(stringPrice.match(regex)[0]); // product price as Number
-      console.log('numericPrice --> ', numericPrice);
+      const title = document.querySelector('h1.product-title__text').textContent.trim(); // product name
       
-      /*const priceString = document.querySelector('span.product-price--highlight').textContent.trim()
-      console.log('\n priceString --> ', priceString);
-      const isDiscounted = priceString.length > 0;
-      console.log('\n isDiscounted --> ', isDiscounted);*/
+      // determine full price
+      let priceString = '';
+      const regex = /\d+\.\d+/;
 
-      // represents all colors on the page
+      const regularPrice = document.querySelector('span.product-price--pdp__regular');
+      const fullPrice = document.querySelector('h2.product-price--pdp');
+      const strikePrice = document.querySelector('span.product-price__strike');
+
+      if(regularPrice) { priceString = regularPrice.textContent.trim() };
+      if(fullPrice) { priceString = fullPrice.textContent.trim() };
+      if(strikePrice) { priceString = fullPrice.textContent.trim() };
+
+      console.log('priceString --> ', priceString);
+      const numericPrice = Number.parseFloat(priceString.match(regex)[0]); // product price as Number
+      console.log('numericPrice --> ', numericPrice);
+
+      // represents all colors on the page as individual Products
       let colors = [];
 
       // represents each section of colors (e.g. where each has its own specific price)
       const colorRadioContainers = [...document.querySelectorAll('div.swatch-price-group')];
 
       for(let container of colorRadioContainers) {
-        // represents the element containing the discounted price
-        const discountElement = container.querySelector('div.product-price__highlight');
-        const discountedPrice = discountElement ? Number.parseFloat(discountElement.textContent.trim().match(regex)[0]) : null; 
-        // represents the actual price of that specific color
-        const currentPrice = discountedPrice || numericPrice;
+        console.log('color container --> ', container);
+
+        // determine discount price
+        let discountPrice = null;
+        const priceInTitle = document.querySelector('h2.product-price--pdp__highlight');
+        const priceInContainer = container.querySelector('div.product-price__highlight');
+
+        if(priceInTitle) { discountPrice = Number.parseFloat(priceInTitle.textContent.trim().match(regex)[0]); }
+        if(priceInContainer) { discountPrice = Number.parseFloat(priceInContainer.textContent.trim().match(regex)[0]); }
+
+        const currentPrice = discountPrice || numericPrice; // final price of color
         console.log('\n currentPrice --> ', currentPrice);
 
         // represents each 'color' radio button in the current container
@@ -128,7 +140,140 @@ const scrapeBananaProduct = async (page, url) => {
         let interColors = [];
         for(let cr of colorRadios) {
           const colorName = cr.getAttribute('value');
+          console.log('colorName --> ', colorName);
+          const colorThumb = cr.parentElement.querySelector('img.swatch__image').getAttribute('src');
+          console.log('colorThumb --> ', colorThumb);
           cr.click(); // selects color
+
+          // get stock image for product
+          //const colorImage = [...document.querySelectorAll('img.pagination__product-image')][0].getAttribute('src');
+          const colorImage = document.querySelector('img.pdp-in-place-zoom-image').getAttribute('src');
+          console.log('colorImg --> ', colorImage);
+
+          // stores sizes for a particular color
+          let sizes = [];
+
+          //const sizeSections = [...document.querySelectorAll('div[role="radiogroup"]')];
+          const sizeSections = [...document.querySelectorAll('div.swatches_dimension')];
+          console.log('sizeSections --> ', sizeSections);
+
+          const primarySize = sizeSections[0];
+          const secondarySize = sizeSections.length > 1 ? sizeSections[1] : undefined;
+
+          const primaryRadios = [...primarySize.querySelectorAll('input.swatch__radio')];
+
+          for(let pr of primaryRadios) {
+            const primarySize = pr.getAttribute('value');
+            const pParent = pr.parentElement;  
+            const oos = pParent.querySelector('svg');
+              
+            if(oos) {
+              continue;
+            };
+
+            if(secondarySize) {
+              const secondaryRadios = [...secondarySize.querySelectorAll('input.swatch__radio')];
+              for(let sr of secondaryRadios) {
+                const secondarySize = sr.getAttribute('value');
+                const sParent = sr.parentElement;  
+                const oos = sParent.querySelector('svg');
+                  
+                if(oos) {
+                  continue;
+                };
+
+                const size = primarySize + ' x ' + secondarySize;
+                sizes.push(size);
+              }
+            } else {
+              sizes.push(primarySize);
+            }
+          }
+    
+          interColors.push({
+            colorName,
+            colorImage, 
+            colorThumb, 
+            colorPrice: currentPrice, 
+            sizes,
+          });
+        };
+
+        // merges colors from current container with the page-wide color collection
+        colors = [...colors, ...interColors];
+      };
+
+      return {
+        title,
+        pid, 
+        pcid, 
+        brand: 'BR', 
+        //category: 
+        // fullPrice: add this
+        colors,  
+      }; 
+    } catch(err) {
+      console.error(err);
+      return err;
+    }
+  });
+  return result;
+}
+
+
+module.exports = {
+  scrapeBananaSale, 
+  scrapeBananaProduct, 
+}
+
+
+
+
+/*
+const scrapeBananaProduct = async (page, url) => {
+  await page.goto(url);
+
+  const result = await page.evaluate(() => {
+    try {
+
+      const url = document.location.href;
+      const urlParams = new URLSearchParams(window.location.search);
+
+      const pid = urlParams.get('pid');
+      const pcid = urlParams.get('pcid');
+
+      const title = document.querySelectorAll('h1.product-title__text')[0].textContent.trim(); // product name
+      const stringPrice = document.querySelectorAll('span.product-price__strike')[0].textContent.trim(); // represents the product's default price (usually full price unless all varieties are discounted)
+      console.log('stringPrice --> ', stringPrice);
+      const regex = /\d+\.\d+/;
+      const numericPrice = Number.parseFloat(stringPrice.match(regex)[0]); // product price as Number
+      console.log('numericPrice --> ', numericPrice);
+
+      // represents all colors on the page
+      let colors = [];
+
+      // represents each section of colors (e.g. where each has its own specific price)
+      const colorRadioContainers = [...document.querySelectorAll('div.swatch-price-group')];
+
+      for(let container of colorRadioContainers) {
+        // represents the element containing the discounted price
+        const discountElement = container.querySelector('h2.product-price--pdp__highlight');
+        const discountedPrice = discountElement ? Number.parseFloat(discountElement.textContent.trim().match(regex)[0]) : null; 
+        // represents the actual price of that specific color
+        const currentPrice = discountedPrice || numericPrice;
+        console.log('\n currentPrice --> ', currentPrice);
+
+        // represents each 'color' radio button in the current container
+        const colorRadios = [...container.querySelectorAll('img.swatch__image')];
+
+        // represents colors from the current container
+        let interColors = [];
+        for(let cr of colorRadios) {
+          const colorName = cr.getAttribute('alt');
+          cr.click(); // selects color
+
+          // get stock image for product
+          const colorImage = document.querySelectorAll('pagination__product-image')[0].getAttribute('src');
 
           // stores sizes for a particular color
           let sizes = [];
@@ -219,6 +364,7 @@ const scrapeBananaProduct = async (page, url) => {
     
           interColors.push({
             colorName,
+            colorImage, 
             colorPrice: currentPrice, 
             sizes,
           });
@@ -244,11 +390,5 @@ const scrapeBananaProduct = async (page, url) => {
   });
   return result;
 }
-
-
-module.exports = {
-  scrapeBananaSale, 
-  scrapeBananaProduct, 
-}
-
+*/
 
