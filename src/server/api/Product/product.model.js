@@ -17,8 +17,6 @@ Categories:
 * Suit Jacket
 * Coat
 * Parka 
-
-
 */
 
 const ProductSchema = new Schema({

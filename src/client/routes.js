@@ -9,8 +9,9 @@ import ProductCollectionPage from './components/Product/components/ProductCollec
 import ProductPage from './components/Product/components/ProductPage';
 import LoginPage from './components/User/pages/UserLoginPage/UserLoginPage';
 import SignUpPage from './components/User/pages/UserCreatePage/UserCreatePage';
-//import ProfilePage from './components/User/pages/UserProfilePage/UserProfilePage';
 
+import ProfilePage from './components/User/pages/UserProfilePage/UserProfilePage';
+import WatchlistPage from './components/Watchlist/components/WatchlistPage';
 
 export default (
   <Switch>
@@ -20,6 +21,8 @@ export default (
 
     <Route path="/users/new" component={SignUpPage} />
     <Route path="/users/login" component={LoginPage} />
+    <Route path="/users/profile" component={ProfilePage} />
+    <Route path="/users/watchlist" component={WatchlistPage} />
   </Switch>
 )
 

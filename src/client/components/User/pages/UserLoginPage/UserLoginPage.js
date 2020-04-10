@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router'
 
 //import styles from './UserLoginPage.scss';
 
@@ -68,7 +66,6 @@ export class UserLoginPage extends React.Component {
 
     return (
       <div>
-        <Helmet title='Login to Your Account.' />
         <form name='loginForm' onSubmit={this.handleSubmit}>
           <div className='form-group'>
             <label htmlFor='email'>Email: </label>

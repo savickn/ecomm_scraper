@@ -24,7 +24,7 @@ import { getProducts, getErrors, getStatus, getCount } from '../ProductReducer';
 import { searchProductsRequest } from '../ProductActions';
 
 /*
-** Class Declaration
+** used to show list of Products
 */
 class ProductCollectionPage extends React.Component {
 

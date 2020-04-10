@@ -22,25 +22,30 @@ const scrapeBananaSale = async (page, site) => {
       throw new Error('Invalid site!');
   }
 
-  await page.goto(salePageString, {waitUntil: 'load' /*'networkidle2'*/,  timeout: 0});
+  await page.goto(salePageString, {waitUntil: 'networkidle2',  timeout: 0});
 
   const result = await page.evaluate(async (helpers) => {
     console.log('helpers --> ', helpers);
 
     let anchors = []; // collect product links
-    var hasNextPage; // track pagination
+    let hasNextPage; // track pagination
 
     do {
       // maybe add 'sleep' between iterations to avoid getting rate-limited
       //await helpers.sleep(1000); // not working
 
       // pagination logic
-      const nextPage = document.querySelector("a.basic-pagination--button[title='next']");
-      console.log('nextpage --> ', nextPage.className);
+      const nextPage = document.querySelector("a.basic-pagination__button[aria-label='Next Page']");
+      console.log('nextPage --> ', nextPage);
+      /*console.log('nextpage --> ', nextPage.className);
       for(let c of nextPage.classList) {
         console.log('class --> ', c);
+      }*/
+      if(nextPage) {
+        hasNextPage = !nextPage.classList.contains('pagination-inactive');
+      } else {
+        hasNextPage = false;
       }
-      hasNextPage = !nextPage.classList.contains('pagination-inactive');
       console.log('hasNextPage --> ', hasNextPage);
 
       // autoScrollPage logic
@@ -56,7 +61,7 @@ const scrapeBananaSale = async (page, site) => {
             clearInterval(timer);
             resolve();
           }
-        }, 20);
+        }, 30);
       });
 
       // scraping logic
@@ -89,8 +94,10 @@ const scrapeBananaProduct = async (page, url) => {
   const result = await page.evaluate(() => {
     try {
 
-      const url = document.location.href;
+      const url = new URL(document.location.href);
       const urlParams = new URLSearchParams(window.location.search);
+
+      const origin = url.origin;
 
       const pid = urlParams.get('pid');
       const pcid = urlParams.get('pcid');
@@ -191,10 +198,19 @@ const scrapeBananaProduct = async (page, url) => {
           }
     
           interColors.push({
-            colorName,
-            colorImage, 
-            colorThumb, 
-            colorPrice: currentPrice, 
+            name: title,
+            pid,
+            pcid,
+            brand: 'BR',
+            
+            fullPrice: numericPrice,
+            currentPrice,
+
+            color: colorName,
+
+            imageSrc: origin + colorImage, 
+            colorSrc: origin + colorThumb, 
+
             sizes,
           });
         };
@@ -203,7 +219,7 @@ const scrapeBananaProduct = async (page, url) => {
         colors = [...colors, ...interColors];
       };
 
-      return {
+      /*return {
         title,
         pid, 
         pcid, 
@@ -211,12 +227,16 @@ const scrapeBananaProduct = async (page, url) => {
         //category: 
         // fullPrice: add this
         colors,  
-      }; 
+      }; */
+      console.log(colors);
+      return colors;
     } catch(err) {
       console.error(err);
       return err;
     }
   });
+  
+  console.log(result);
   return result;
 }
 
@@ -392,3 +412,89 @@ const scrapeBananaProduct = async (page, url) => {
 }
 */
 
+
+/* OLD
+
+
+const scrapeBananaSale = async (page, site) => {
+  let salePageString = '';
+  
+  const gapString = 'https://www.gapcanada.ca/browse/category.do?cid=1065870&mlink=homepage,,flyout_men_Men_s_Sale&departmentRedirect=true#pageId=0&department=75';
+  const onString = 'https://oldnavy.gapcanada.ca/browse/category.do?cid=26061&mlink=11174,13518818,flyout_m_SALE&clink=13518818';
+  const brString = 'https://bananarepublic.gapcanada.ca/browse/category.do?cid=1014757&sop=true';
+  
+  switch(site) {
+    case 'GAP':
+      salePageString = gapString;
+      break;
+    case 'BR':
+      salePageString = brString;
+      break;
+    case 'ON':
+      salePageString = onString;
+      break;
+    default:
+      throw new Error('Invalid site!');
+  }
+
+  await page.goto(salePageString, {waitUntil: 'load' ,  timeout: 0});
+
+  const result = await page.evaluate(async (helpers) => {
+    console.log('helpers --> ', helpers);
+
+    let anchors = []; // collect product links
+    var hasNextPage; // track pagination
+
+    do {
+      // maybe add 'sleep' between iterations to avoid getting rate-limited
+      //await helpers.sleep(1000); // not working
+
+      // pagination logic
+      const nextPage = document.querySelector("a.basic-pagination--button[title='next']");
+      //console.log('nextpage --> ', nextPage.className);
+      for(let c of nextPage.classList) {
+        console.log('class --> ', c);
+      }
+      hasNextPage = !nextPage.classList.contains('pagination-inactive');
+      console.log('hasNextPage --> ', hasNextPage);
+
+      // autoScrollPage logic
+      await new Promise((resolve, reject) => {
+        var totalHeight = 0;
+        var distance = 80;
+        var timer = setInterval(() => {
+          var scrollHeight = document.body.scrollHeight;
+          window.scrollBy(0, distance);
+          totalHeight += distance;
+    
+          if(totalHeight >= scrollHeight){
+            clearInterval(timer);
+            resolve();
+          }
+        }, 20);
+      });
+
+      // scraping logic
+      const products = [...document.querySelectorAll('div.product-card')];
+      console.log('# of products --> ', products.length);
+      for(let p of products) {
+        const anchor = p.querySelector('a');
+        if(anchor) {
+          console.log('product link --> ', anchor.href);
+          anchors.push(anchor.href);
+        }
+      }
+
+      //move to next page
+      if(hasNextPage) {
+        nextPage.click();
+      }
+    } while(hasNextPage);
+
+    return anchors;
+  }, helpers);
+  console.log('result --> ', result);
+  console.log('arr length --> ', result.length);
+  retu
+
+*/

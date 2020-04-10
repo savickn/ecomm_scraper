@@ -4,11 +4,13 @@ import path from 'path';
 
 import productRoutes from './api/Product/product.routes';
 import userRoutes from './api/User/user.routes';
+import watchlistRoutes from './api/Watch/watch.routes';
 
 import authRoutes from './auth/auth.routes';
 
 export default function(app) {
   console.log('registering routes');
+  app.use('/api/watches', watchlistRoutes);
   app.use('/api/products', productRoutes);
   app.use('/api/users', userRoutes);
 

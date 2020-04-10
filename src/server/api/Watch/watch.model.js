@@ -11,7 +11,7 @@ const WatchSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Product',
   },
-  shouldEmail: {
+  shouldEmail: { // should be in User preferences instead ???
     type: Boolean,
     default: true,
   }, 
@@ -22,8 +22,8 @@ const WatchSchema = new Schema({
 });
 
 // update 'watchlist' field of 'userId' when watch is created
-WatchSchema.pre('save', (next) => {
-  mongoose.model('User').findByIdAndUpdate(this.userId, { $push: { watches: this._id }})
+WatchSchema.pre('save', function(next) {
+  mongoose.model('User').findByIdAndUpdate(this.userId, { $push: { watchlist: this._id }})
     .then((user) => {
       console.log('watch pre-save success --> ', user);
       return next();
@@ -33,8 +33,8 @@ WatchSchema.pre('save', (next) => {
 });
 
 // update 'watchlist' field of 'userId' when watch is deleted
-WatchSchema.pre('remove', (next) => {
-  mongoose.model('User').findByIdAndUpdate(this.userId, { $pull: { watches: this._id }})
+WatchSchema.pre('remove', function(next) {
+  mongoose.model('User').findByIdAndUpdate(this.userId, { $pull: { watchlist: this._id }})
     .then((user) => {
       console.log('watch pre-remove success --> ', user);
       return next();

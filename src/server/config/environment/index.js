@@ -26,7 +26,7 @@ const all = {
   secrets: {
     session: process.env.SESSION || env.SESSION_SECRET,
     serverEmail: process.env.EADDRESS || env.HOME_EMAIL,
-    emailPassword: process.env.EPASS || env.PASSWORD
+    emailPassword: process.env.EPASS || env.EMAIL_PASSWORD
   },
 
   userRoles: ['guest', 'user', 'admin'],

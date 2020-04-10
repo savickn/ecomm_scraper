@@ -68,7 +68,79 @@ const searchProducts = (req, res) => {
 
   console.log('searchObj --> ', searchObj);
 
-  Product.count(searchObj, (err, count) => {
+  // apply pagination
+  let skip = 0; 
+  let limit = 100;
+  if(pagination.currentPage && pagination.pageSize) {
+    skip = (pagination.currentPage - 1) * pagination.pageSize;
+    limit = pagination.pageSize;
+  }
+
+  // aggregation with pagination + count
+  Product.aggregate([
+    {$match: searchObj}, 
+    {$group: {
+      _id: "$pid", 
+      assets: {$push: "$$ROOT"}
+    }},
+    {$facet: {
+      paginatedResults: [{$skip: skip}, {$limit: limit}], 
+      totalCount: [{$count: "count"}]
+    }}, 
+  ])
+  .then(data => {
+    console.log('searchProducts  --> ', data);
+    let products = data[0].paginatedResults;
+    let count = data[0].totalCount;
+    return res.status(200).json({ products, count })
+  })
+  .catch(err => {
+    console.log('searchProducts err --> ', err);
+    return res.status(500).send(err);
+  })
+}
+
+/*
+** get one product with full priceHistory
+*/
+const getProduct = (req, res) => {
+  Product.find({ 'pid': req.params.pid })
+    .populate('history', Price)
+    .exec((err, product) => {
+      console.log(err, '\n \n', product);
+      if(err) return res.status(401).send(err);
+      return res.status(200).json({ product });
+  })
+}
+
+/*
+** add/update product entry
+*/
+const upsertProduct = (data) => {
+  if(!data.url || !data.name || !data.pid || !data.color) {
+    console.error('Invalid arguments!');
+    return;
+  }
+
+  return Product.findOneAndUpdate({ pid: data.pid, color: data.color }, data, { new: true, runValidators: true, upsert: true }).then((product) => {
+    //console.log('\n Success! Updated Product --> ', product);
+    return product;
+  }).catch((err) => {
+    console.error('Unable to locate product. Error --> ', err);
+    return err;
+  })
+};
+
+
+module.exports = {
+  searchProducts,
+  getProduct, 
+  upsertProduct, 
+}
+
+
+/* OLD */
+  /*Product.count(searchObj, (err, count) => {
     if(err) return res.status(501).send(err);
 
     let query = Product.find(searchObj);
@@ -84,57 +156,11 @@ const searchProducts = (req, res) => {
       query = query.sort();
     }*/
 
-    query.exec(function (err, products) {
+    /*query.exec(function (err, products) {
         if(err) return res.status(501).send(err);
-
-        // should filter 'priceHistory' for most recent price here or at client???
-        /*products = products.map((val) => {
-          val.priceHistory = val.priceHistory[val.priceHistory.length - 1];
-          return val;
-        });*/
-
         return res.status(200).json({products, count});
     });
-  });
-}
-
-/*
-** get one product with full priceHistory
-*/
-const getProduct = (req, res) => {
-  Product.findOne({ 'pid': req.params.pid })
-    .populate('history', Price)
-    .exec((err, product) => {
-      console.log(err, '\n \n', product);
-      if(err) return res.status(401).send(err);
-      return res.status(200).json({ product });
-  })
-}
-
-/*
-** Used to add/update product entry
-*/
-const upsertProduct = (data) => {
-  if(!data.url || !data.name || !data.pid) {
-    console.error('Invalid arguments!');
-    return;
-  }
-
-  return Product.findOneAndUpdate({ pid: data.pid }, data, { new: true, runValidators: true, upsert: true }).then((product) => {
-    //console.log('\n Success! Updated Product --> ', product);
-    return product;
-  }).catch((err) => {
-    console.error('Unable to locate product. Error --> ', err);
-    return err;
-  })
-};
-
-
-module.exports = {
-  searchProducts,
-  getProduct, 
-  upsertProduct, 
-}
+  });*/
 
 
 

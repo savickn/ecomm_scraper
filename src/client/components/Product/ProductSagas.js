@@ -101,7 +101,7 @@ export function* searchProductsHandler(action) {
     //const { freshSearch, freshPagination } = checkLocalStorage(action.payload.search, action.payload.pagination);
     const res = yield call(searchProducts, action.payload.search, action.payload.pagination);
     console.log('fetchProducts res --> ', res);
-    yield put(searchProductsSuccess(res.products, res.count));
+    yield put(searchProductsSuccess(res.products, res.count[0].count));
   } catch(error) {
     console.log('fetchProducts error --> ', error);
     yield put(searchProductsError(error));
@@ -109,7 +109,7 @@ export function* searchProductsHandler(action) {
 }
 
 /*
-** GET PRODUCT
+** get family of Products via 'pid'
 */
 
 export function* fetchProductWatcher() {

@@ -5,6 +5,7 @@ import account from './components/User/AccountReducer';
 import users from './components/User/UserReducer';
 import products from './components/Product/ProductReducer';
 import prices from './components/Product/PriceReducer';
+import watchlists from './components/Watchlist/WatchlistReducer';
 
 import alerts from './components/Utility/Alert/alertReducer';
 import modal from './components/Utility/Modal/modalReducer';
@@ -15,12 +16,15 @@ import modal from './components/Utility/Modal/modalReducer';
 */
 let reducers = {
   app,
-  users,
+  alerts,  
+  modal,   
+  
   account,
-  alerts, 
+  users,
   products, 
   prices, 
-  modal, 
+  watchlists, 
+ 
 };
 
 export default reducers;

@@ -9,7 +9,7 @@ const initialState = {
   status: 'IDLE',
   errors: null,
   data: [], 
-  product: null, 
+  current: [], 
   count: 0, 
 };
 
@@ -58,14 +58,14 @@ const ProductReducer = (state = initialState, action) => {
     case FETCH_PRODUCT_REQUEST:
       return Object.assign({}, state, {
         status: 'BUSY',
-        product: null, 
+        current: [], 
         errors: null, 
       });
 
     case FETCH_PRODUCT_SUCCESS:
       return Object.assign({}, state, {
         status: 'IDLE',
-        product: action.product,
+        current: [...action.product],
       });
 
     case FETCH_PRODUCT_ERROR:
@@ -81,7 +81,7 @@ const ProductReducer = (state = initialState, action) => {
 
 export const getCount = (state) => state.products.count;
 export const getProducts = (state) => state.products.data;
-export const getProduct = (state, id) => state.products.product;
+export const getProduct = (state, id) => state.products.current;
 
 export const getStatus = (state) => state.products.status;
 export const getErrors = (state) => state.products.errors;

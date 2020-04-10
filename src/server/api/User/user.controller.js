@@ -40,7 +40,6 @@ export const addUser = (req, res) => {
 export const getMe = (req, res) => {
   User.findOne({_id: req.user._id})
   .select('-salt -hashedPassword -provider')
-  .populate('groups events displayPicture')
   .exec(function(err, user) { // don't ever give out the password or salt
     if (err) return res.status(500).send(err);
     if (!user) return res.status(401).send('Unauthorized');

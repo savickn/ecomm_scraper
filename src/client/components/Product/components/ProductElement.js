@@ -22,13 +22,14 @@ class ProductElement extends React.Component {
     //console.log('productElement styles --> ', styles);
 
     const product = this.props.product;
-    const img = product.image || noPic;
+    const { url, imageSrc, name, } = this.props.product.assets[0];
+    const img = /*imageSrc ||*/ noPic;
 
     return product ? (
       <div className={styles.productFlexItem}>
         <img src={img} width='200' height='200' />
-        <Link to={`products/${product.pid}`}>{product.name}</Link>
-        <a href={product.url}> Buy Now! </a>
+        <Link to={`products/${product._id}`}>{name}</Link>
+        <a href={url}> Buy Now! </a>
       </div>
     ) : <div></div>;
   }
@@ -37,10 +38,13 @@ class ProductElement extends React.Component {
 //<div>{product.originalPrice} <span>{product.currentPrice}</span></div>
 
 ProductElement.propTypes = {
-  /*product: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    price: PropTypes.string.isRequired,    
-  }).isRequired, */
+  product: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    assets: PropTypes.arrayOf(PropTypes.shape({
+      color: PropTypes.string.isRequired, 
+      currentPrice: PropTypes.string.isRequired, 
+    })),    
+  }).isRequired, 
 }
 
 export default ProductElement;

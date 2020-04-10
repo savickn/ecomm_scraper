@@ -1,6 +1,9 @@
 
 const mongoose = require('mongoose');
 const Winston = require('winston');
+const redis = require('redis');
+
+const redisClient = redis.createClient();
 
 const logger = Winston.createLogger({
   level: 'info',
@@ -19,39 +22,39 @@ const promoScraper = require('./logic/promotions');
 mongoose.Promise = global.Promise;
 
 mongoose.connect('mongodb://localhost/fashionscraper_dev')
-  .then(async () => {
+  .then(async (db) => {
     logger.log('info', 'Connected to mongoDB!');
     
     try {
-      await scraperTests.testAll();
+      //await scraperTests.testAll();
+      await scrapers.scrapeAll();
       
-      //await scrapers.scrapeAll();
       //await scrapers.scrapePromos();
       //await promoScraper.scrapeAllPromos();
-      //mongoose.connection.close(); // throws error 'Topology was destroyed'
     } catch(error) {
       console.error('catch block error --> ', error);
       throw error;
     }
+
+    process.exit(); // obv not ideal !!!
+    //await db.disconnect();
+    //mongoose.connection.close(); // throws error 'Topology was destroyed'
+
   }).catch((error) => {
     logger.log('error', 'Please make sure Mongodb is installed and running!');
     throw error;
   });
 
 
-//(await scrapers.scrapeAll())();
 
 /*setInterval(() => {
   logger.log('info', 'Logging \n');
 }, 5000);*/
 
 
-/*Product.create({name: 'first', price: '10'}, () => {
-  console.log('Product created!');
-});*/
-
-
-
+module.exports = {
+  redisClient, 
+}
 
 
 

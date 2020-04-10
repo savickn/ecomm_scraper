@@ -9,14 +9,14 @@ const jcrew = require('./logic/jcrew');
 
 const analytics = require('./logic/analytics');
 const helpers = require('./logic/helpers');
-const ProductController = require('../server/api/Product/product.controller');
-const HistoryController = require('../server/api/PriceHistory/price.controller');
+const ProductController = require('../../server/api/Product/product.controller');
+const HistoryController = require('../../server/api/PriceHistory/price.controller');
 //import * as ProductController from '../server/api/Product/product.controller';
 
 
 
 const scrapeAll = async () => {
-  const browser = await puppeteer.launch({headless: true});
+  const browser = await puppeteer.launch({headless: false});
   const page = await browser.newPage();
   
   /* write logs to shell console instead of browser console
@@ -27,8 +27,8 @@ const scrapeAll = async () => {
     }
   }); */
 
-  //await scrapeBR(page);
-  await scrapeGAP(page);
+  await scrapeBR(page);
+  //await scrapeGAP(page);
   //await scrapeON(page);
   //await scrapeJC(page);
 }
@@ -59,55 +59,50 @@ const scrapeJC = async () => {
   // scrape current promotions from home page
   // NOT IMPLEMENTED
 
-  // scrape links from sale page
-  const links = await jcrew.scrapeJcrewSale(page);
+  const links = await jcrew.scrapeJcrewSale(page); // scrape links from sale page
 
-  // scrape price/colors/sizes from product pages
-  await scrapeProduct(page, links, jcrew.scrapeJcrewProduct);
+  await scrapeProduct(page, links, jcrew.scrapeJcrewProduct); // scrape price/colors/sizes from product pages
 }
 
-
+// scrape price/colors/sizes from product pages
 const scrapeProduct = async (page, links, scraper) => {
-  // scrape price/colors/sizes from product pages
   for(let l of links) {
     await helpers.sleep(2500);
 
-    let productData = await scraper(page, l);
-    //console.log('\n productData --> ', productData);
+    
+    try {
+      let productData = await scraper(page, l);
+      //console.log('\n productData --> ', productData);
+    
+      for(let p of productData) {
+        // guard against empty objects
+        if(!p.name) continue;
 
-    // guard against empty objects
-    if(!productData.title) continue;
+        let product = {
+          url: l, 
+          ...p,  
+          keywords: analytics.analyzeKeywords(p.name),  
+        };
 
-    let product = {
-      url: l, 
-      name: productData.title,
-      //fullPrice
-      pid: productData.pid, 
-      pcid: productData.pcid, 
-      brand: productData.brand,  
-      keywords: analytics.analyzeKeywords(productData.title), 
-      colors: productData.colors, 
-    };
+        //console.log('\n scrapeProduct finalProduct --> ', product);
 
-    //console.log('\n scrapeProduct finalProduct --> ', product);
+        let newProduct = await ProductController.upsertProduct(product);
 
-    let newProduct = await ProductController.upsertProduct(product);
+        console.log('\n scrapeProduct newProduct --> ', newProduct);
 
-    console.log('\n scrapeProduct newProduct --> ', newProduct);
-
-    // now create priceHistory
-    for(let color of productData.colors) {
-      const colorObj = {
-        ...color,
-        date: Date.now(), 
-        productId: newProduct._id, 
+        // now create priceHistory
+        let colorObj = {
+          price: p.currentPrice,
+          date: Date.now(),
+          productId: newProduct._id, 
+        }
+        await HistoryController.savePrice(colorObj);
       }
-      console.log('color --> ', colorObj);
-      HistoryController.savePrice(colorObj);
+    } catch(err) {
+      console.log('scrapeProduct err --> ', err);
     }
   }
 }
-
 
 
 module.exports = {

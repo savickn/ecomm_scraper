@@ -2,6 +2,7 @@
 import AccountSagas from './components/User/AccountSagas';
 import UserSagas from './components/User/UserSagas';
 import ProductSagas from './components/Product/ProductSagas';
+import WatchSagas from './components/Watchlist/WatchlistSagas';
 
 import AlertSagas from './components/Utility/Alert/alertSagas';
 
@@ -12,7 +13,8 @@ export default function* rootSaga() {
     ...AccountSagas,
     ...UserSagas, 
     ...AlertSagas,
-    ...ProductSagas, 
+    ...ProductSagas,
+    ...WatchSagas,  
   ])
 }
 

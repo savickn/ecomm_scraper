@@ -1,5 +1,19 @@
 
 
-.graph {
-  
+.infoContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.imageSidebar {
+  flex: 1;
+}
+
+.info {
+  flex: 3;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }

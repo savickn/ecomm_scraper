@@ -1,6 +1,8 @@
 
 const PriceHistory = require('./price.model');
+const root = require('../../../scripts/scraper/start');
 
+const dayInMilliseconds = 60 * 60 * 24 * 1000;
 
 // used to retreive all price history via 'productId'
 const getHistory = (req, res) => {
@@ -14,21 +16,29 @@ const getHistory = (req, res) => {
 ** create new price entries
 */
 const savePrice = (data) => {
-  if(!data.colorPrice || !data.colorName || !data.productId) {
+  if(!data.price || !data.productId) {
     console.error('savePrice ---> Invalid arguments!');
     return;
   }
 
   // only save price if changed
-  PriceHistory.findOne({ productId: data.productId })
+  return PriceHistory.findOne({ productId: data.productId })
     .sort({ date: -1 })
-    .exec().then((price) => {
-      console.log('pricehistory fineOne price --> ', price);
-      if(!price || price.colorPrice != data.colorPrice) {
-        PriceHistory.create(data, (err, price) => {
-          if(err) console.error('savePrice create err --> ', err);
-          console.log('Added price --> ', price);
-        })
+    .then((prevPrice) => {
+      if(!prevPrice || prevPrice.price != data.price || Date.now() - data.date > 7 * dayInMilliseconds ) {
+        return PriceHistory.create(data)
+          .then(newPrice => {
+            console.log('Added price --> ', newPrice);
+
+            if(newPrice.price < prevPrice.price) {
+              // add to Redis queue
+              const check = { productId: newPrice.productId, price: newPrice.price };
+              root.redisClient.rpush('priceChecks', JSON.stringify(check));
+            }
+          })
+          .catch(err => { 
+            console.error('savePrice create err --> ', err) 
+          })
       }
     }).catch((err) => {
       console.error('savePrice findOne err --> ', err);

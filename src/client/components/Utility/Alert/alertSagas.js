@@ -1,6 +1,5 @@
 
-import { delay } from 'redux-saga';
-import { takeLatest, put, fork } from 'redux-saga/effects';
+import { takeLatest, put, fork, delay } from 'redux-saga/effects';
 
 
 export function* alertWatcher() {

@@ -34,11 +34,53 @@ export class Pagination extends Component {
     })
   }
 
+  /* UI METHODS */
+
+  // used to determine which pages to include as buttons
+  getButtonArray = (pageCount, currentPage) => {
+    // PRECONDITIONS:
+    // always draw 10 buttons
+
+    if(pageCount <= 10) {
+      return [...Array(pageCount).keys()].map(x => ++x);
+    }
+
+    const nums = [];
+
+    const skipToFirst = currentPage > 5;
+    const skipToLast = pageCount > 10;
+
+    if(skipToFirst && skipToLast) {
+      nums.push(1);
+      nums.push('...');
+      nums.push(currentPage - 2);
+      nums.push(currentPage - 1);
+      nums.push(currentPage);
+      nums.push(currentPage + 1);
+      nums.push(currentPage + 2);
+      nums.push(currentPage + 3);
+      nums.push('...');
+      nums.push(pageCount);
+    } else if (!skipToFirst && skipToLast) {
+      for(let n of [...Array(8).keys()]) {
+        nums.push(n + 1);
+      }
+      nums.push('...');
+      nums.push(pageCount);
+    }
+
+    return nums;
+  }
+
   render() {
     if(!this.props.collectionSize) return <div></div>
 
     const pageCount = Math.ceil(this.props.collectionSize / this.props.pageSize);
-    const nums = Array.from(Array(pageCount).keys());
+    
+    // OLD
+    //const nums = Array.from(Array(pageCount).keys());
+    
+    const nums = this.getButtonArray(pageCount, this.props.currentPage);
 
     return (
       <div>
@@ -52,7 +94,7 @@ export class Pagination extends Component {
             nums.map((num) => {
               return (
                 <Nav.Item>
-                  <Nav.Link eventKey={num + 1} onSelect={() => this.handlePageChange(num + 1)}> {num + 1} </Nav.Link>
+                  <Nav.Link eventKey={num + 1} onSelect={() => this.handlePageChange(num + 1)}> {num} </Nav.Link>
                 </Nav.Item>
               );
             })
