@@ -1,9 +1,18 @@
 
+// used to run server-side tasks (e.g. scraping, db maintainence, emailing)
+
 const mongoose = require('mongoose');
 const Winston = require('winston');
-const redis = require('redis');
 
-const redisClient = redis.createClient();
+const scrapers = require('./scraper/scrape');
+const scraperTests = require('./scraper/tests');
+const promoScraper = require('./scraper/logic/promotions');
+
+// import mongoose from 'mongoose';
+// import Winston from 'winston';
+
+import { test, checkWatchlists } from './tasks/email';
+
 
 const logger = Winston.createLogger({
   level: 'info',
@@ -15,19 +24,24 @@ const logger = Winston.createLogger({
   ]
 });
 
-const scrapers = require('./scrape');
-const scraperTests = require('./tests');
-const promoScraper = require('./logic/promotions');
-
 mongoose.Promise = global.Promise;
 
 mongoose.connect('mongodb://localhost/fashionscraper_dev')
   .then(async (db) => {
     logger.log('info', 'Connected to mongoDB!');
+    console.log('Connected to MongoDB!');
     
     try {
+
+      console.log('cli args --> ', process.argv);
+
       //await scraperTests.testAll();
-      await scrapers.scrapeAll();
+      //await scrapers.scrapeAll();
+
+      await test();
+      //checkWatchlists();
+
+      // should either schedule the 'checkPriceDrops' script or call it directly
       
       //await scrapers.scrapePromos();
       //await promoScraper.scrapeAllPromos();
@@ -36,7 +50,7 @@ mongoose.connect('mongodb://localhost/fashionscraper_dev')
       throw error;
     }
 
-    process.exit(); // obv not ideal !!!
+    //process.exit(); // obv not ideal !!!
     //await db.disconnect();
     //mongoose.connection.close(); // throws error 'Topology was destroyed'
 
@@ -44,17 +58,4 @@ mongoose.connect('mongodb://localhost/fashionscraper_dev')
     logger.log('error', 'Please make sure Mongodb is installed and running!');
     throw error;
   });
-
-
-
-/*setInterval(() => {
-  logger.log('info', 'Logging \n');
-}, 5000);*/
-
-
-module.exports = {
-  redisClient, 
-}
-
-
 

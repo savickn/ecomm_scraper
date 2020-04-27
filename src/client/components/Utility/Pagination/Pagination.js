@@ -15,6 +15,11 @@ export class Pagination extends Component {
 
   // change current page (e.g. first vs. last)
   handlePageChange = (selectedPage) => {
+    // guards against case where 'selectedPage' is '...'
+    if(selectedPage === '...') {
+      return;
+    }
+
     console.log('selectedPage', selectedPage);
     const pageCount = Math.ceil(this.props.collectionSize / this.props.pageSize)
     if(selectedPage < 1) selectedPage = 1; // guards against invalid page
@@ -48,7 +53,7 @@ export class Pagination extends Component {
     const nums = [];
 
     const skipToFirst = currentPage > 5;
-    const skipToLast = pageCount > 10;
+    const skipToLast = pageCount > 10 && pageCount - currentPage > 4;
 
     if(skipToFirst && skipToLast) {
       nums.push(1);
@@ -67,6 +72,12 @@ export class Pagination extends Component {
       }
       nums.push('...');
       nums.push(pageCount);
+    } else if (skipToFirst && !skipToLast) {
+      nums.push(1);
+      nums.push('...');
+      for(let n of [...Array(8).keys()].reverse()) {
+        nums.push(pageCount - n);
+      }
     }
 
     return nums;
@@ -75,10 +86,9 @@ export class Pagination extends Component {
   render() {
     if(!this.props.collectionSize) return <div></div>
 
+    console.log('pagination --> ', this.props);
+
     const pageCount = Math.ceil(this.props.collectionSize / this.props.pageSize);
-    
-    // OLD
-    //const nums = Array.from(Array(pageCount).keys());
     
     const nums = this.getButtonArray(pageCount, this.props.currentPage);
 
@@ -94,7 +104,7 @@ export class Pagination extends Component {
             nums.map((num) => {
               return (
                 <Nav.Item>
-                  <Nav.Link eventKey={num + 1} onSelect={() => this.handlePageChange(num + 1)}> {num} </Nav.Link>
+                  <Nav.Link eventKey={num} onSelect={() => this.handlePageChange(num)}> {num} </Nav.Link>
                 </Nav.Item>
               );
             })

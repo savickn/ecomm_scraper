@@ -25,6 +25,10 @@ const ProductSchema = new Schema({
   color: String, // name of color
   fullPrice: String, // regular price
   currentPrice: String, // current price (e.g. can be the same as fullPrice or can be a discounted price)
+  outOfStock: {
+    type: Boolean, // is True if product is Out Of Stock
+    default: false,
+  },
   pid: String, // in pid format, e.g. ???
   pcid: String, // category, in pcid format, e.g. 5319
   brand: String, // e.g. BR/GAP
@@ -46,6 +50,8 @@ const ProductSchema = new Schema({
   onSale: Boolean, // used to determine if Promotion applies
   // something for .00 products
 
+}, {
+  timestamps: true,
 }); 
 
 ProductSchema.virtual('isOnSale').get(() => {

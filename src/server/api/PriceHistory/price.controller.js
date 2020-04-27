@@ -1,6 +1,6 @@
 
 const PriceHistory = require('./price.model');
-const root = require('../../../scripts/scraper/start');
+const redis_client = require('../../../scripts/redis');
 
 const dayInMilliseconds = 60 * 60 * 24 * 1000;
 
@@ -29,11 +29,12 @@ const savePrice = (data) => {
         return PriceHistory.create(data)
           .then(newPrice => {
             console.log('Added price --> ', newPrice);
+            //console.log('\n newPrice --> ', newPrice.price, '\n prevPrice --> ', prevPrice.price);
 
-            if(newPrice.price < prevPrice.price) {
-              // add to Redis queue
-              const check = { productId: newPrice.productId, price: newPrice.price };
-              root.redisClient.rpush('priceChecks', JSON.stringify(check));
+            if(!prevPrice || newPrice.price < prevPrice.price) {
+              const check = { productId: newPrice.productId, price: newPrice.price, }; // add to Redis queue
+              console.log('adding to queue --> ', check);
+              redis_client.rpush('priceChecks', JSON.stringify(check));
             }
           })
           .catch(err => { 
@@ -43,11 +44,6 @@ const savePrice = (data) => {
     }).catch((err) => {
       console.error('savePrice findOne err --> ', err);
     })
-
-  /*PriceHistory.create(data, (err, price) => {
-    if(err) console.error('savePrice err --> ', err);
-    console.log('savePrice success --> ', price);
-  })*/
 }
 
 module.exports = {

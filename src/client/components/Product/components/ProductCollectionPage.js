@@ -115,7 +115,7 @@ class ProductCollectionPage extends React.Component {
 
     return (
       <React.Fragment>
-        <SearchBar searchFunc={this.advancedSearch} filterMap={this.filters} sortingMap={this.sortingMap} />
+        <SearchBar id='productSearch' searchFunc={this.advancedSearch} filterMap={this.filters} sortingMap={this.sortingMap} />
         <div className='flex-grid'>
           {this.props.products.map((product) => {
             return <ProductElement product={product} key={product._id} />

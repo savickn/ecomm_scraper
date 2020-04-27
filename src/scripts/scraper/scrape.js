@@ -2,6 +2,9 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
 const util = require('util');
+const _ = require('lodash');
+
+const redis_client = require('../redis');
 
 const br = require('./logic/br');
 const gap = require('./logic/gap');
@@ -11,8 +14,6 @@ const analytics = require('./logic/analytics');
 const helpers = require('./logic/helpers');
 const ProductController = require('../../server/api/Product/product.controller');
 const HistoryController = require('../../server/api/PriceHistory/price.controller');
-//import * as ProductController from '../server/api/Product/product.controller';
-
 
 
 const scrapeAll = async () => {
@@ -34,42 +35,42 @@ const scrapeAll = async () => {
 }
 
 const scrapeBR = async (page) => {
-  // scrape current promotions from home page
-  // NOT IMPLEMENTED 
-
   // scrape links from sale page
-  const links = await br.scrapeBananaSale(page, 'BR');
-  
+  const url = 'https://bananarepublic.gapcanada.ca/browse/category.do?cid=1014757&sop=true';
+  const links = await scrapeLinks(page, url, br.scrapeBananaSale);
+  //const links = ['https://bananarepublic.gapcanada.ca/browse/product.do?pid=550363003&cid=1091405&pcid=1014757&vid=1&grid=pds_0_921_1#pdp-page-content']
+
   // scrape product data from links
   await scrapeProduct(page, links, br.scrapeBananaProduct);
 }
 
-const scrapeGAP = async (page) => {
-  // scrape current promotions from home page
-  // NOT IMPLEMENTED
+// scrape page urls from websites
+const scrapeLinks = async (page, url, linkScraper) => {
+  await page.goto(url, {waitUntil: 'networkidle2',  timeout: 0});
 
-  // scrape links from sale page
-  const links = await gap.scrapeGapSale(page);
+  const links = await linkScraper(page);
+  console.log('\n \n scrapedLinks --> ', links);
 
-  // scrape price/colors/sizes from product pages
-  await scrapeProduct(page, links, gap.scrapeGapProduct);
+  // return redis_client.lrange(url, 0, -1, (existingLinks) => {
+  //   console.log('\n \n existingLinks --> ', existingLinks);
+
+  //   const joinedArr = _.union(links, existingLinks);
+  //   console.log('\n \n joinedArr --> ', joinedArr);
+
+  //   return joinedArr;
+  // });
+
+  redis_client.rpush.apply(redis_client, [url].concat(links));
+
+  return links;
 }
 
-const scrapeJC = async () => {
-  // scrape current promotions from home page
-  // NOT IMPLEMENTED
-
-  const links = await jcrew.scrapeJcrewSale(page); // scrape links from sale page
-
-  await scrapeProduct(page, links, jcrew.scrapeJcrewProduct); // scrape price/colors/sizes from product pages
-}
 
 // scrape price/colors/sizes from product pages
 const scrapeProduct = async (page, links, scraper) => {
   for(let l of links) {
     await helpers.sleep(2500);
 
-    
     try {
       let productData = await scraper(page, l);
       //console.log('\n productData --> ', productData);
@@ -80,6 +81,7 @@ const scrapeProduct = async (page, links, scraper) => {
 
         let product = {
           url: l, 
+          outOfStock: false, 
           ...p,  
           keywords: analytics.analyzeKeywords(p.name),  
         };
@@ -108,10 +110,37 @@ const scrapeProduct = async (page, links, scraper) => {
 module.exports = {
   scrapeAll,
   scrapeBR,
-  scrapeGAP,
-  scrapeJC, 
+  //scrapeGAP,
+  //scrapeJC, 
   scrapeProduct, 
+  scrapeLinks, 
 };
+
+
+
+/*
+
+const scrapeGAP = async (page) => {
+  // scrape current promotions from home page
+  // NOT IMPLEMENTED
+
+  // scrape links from sale page
+  const links = await gap.scrapeGapSale(page);
+
+  // scrape price/colors/sizes from product pages
+  await scrapeProduct(page, links, gap.scrapeGapProduct);
+}
+
+const scrapeJC = async () => {
+  // scrape current promotions from home page
+  // NOT IMPLEMENTED
+
+  const links = await jcrew.scrapeJcrewSale(page); // scrape links from sale page
+
+  await scrapeProduct(page, links, jcrew.scrapeJcrewProduct); // scrape price/colors/sizes from product pages
+}
+
+*/
 
 
 /* Product Page Logic */

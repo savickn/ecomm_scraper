@@ -49,7 +49,9 @@ const searchProducts = (req, res) => {
   console.log('searchProducts pagination --> ', pagination);
   console.log('searchProducts sorting --> ', '');
 
-  let searchObj = {};
+  let searchObj = {
+    //outOfStock: false, 
+  };
 
   // basic search features
   if(search.name) { searchObj.name = new RegExp(search.name, "i"); }

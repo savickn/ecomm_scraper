@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 
 const helpers = require('./helpers');
 
-const Promotion = require('../../server/api/Promotion/promotion.model');
+const Promotion = require('../../../server/api/Promotion/promotion.model');
 
 /*
 ** entry method for scraping site-wide promos from all e-commerce sites
@@ -68,7 +68,7 @@ const scrapeGapPromos = async (page) => {
 /*
 ** BR promos (WORKING)
 */
-scrapeBrPromos = async (page) => {
+const scrapeBrPromos = async (page) => {
   const url = 'https://bananarepublic.gapcanada.ca/';
   await page.goto(url, {waitUntil: 'load' /*'networkidle2'*/,  timeout: 0});
 
@@ -94,7 +94,7 @@ scrapeBrPromos = async (page) => {
 /*
 ** ON promos (NOT WORKING)
 */
-scrapeOnPromos = async (page) => {
+const scrapeOnPromos = async (page) => {
   const url = 'https://oldnavy.gapcanada.ca/';
   await page.goto(url, {waitUntil: 'load' /*'networkidle2'*/,  timeout: 0});
 

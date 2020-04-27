@@ -84,13 +84,15 @@ class App extends React.Component {
             <div className='container'>
               {routes}
             </div>
-            <DevTools />
+            
           </div>
         }
       </React.Fragment>
     );
   }
 }
+
+//<DevTools />
 
 App.propTypes = {
   //children: PropTypes.object.isRequired,

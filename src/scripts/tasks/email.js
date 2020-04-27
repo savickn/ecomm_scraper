@@ -1,13 +1,12 @@
+
 import _ from 'lodash';
 import path from 'path';
 
 import nodemailer from 'nodemailer';
 import { EmailTemplate } from 'email-templates-v2';
 
-import config from  '../../server/config/environment/index';
+import config from  '../../server/config/environment';
 import env from '../../server/config/local.env';
-
-import * as root from '../scraper/start';
 
 // create an email to notify User of a price drop for a watchlist Product
 export const priceDropEmailer = (data /*resolve, reject*/) => {
@@ -53,13 +52,8 @@ export const priceDropEmailer = (data /*resolve, reject*/) => {
   });
 }
 
-// check Watches
-// can add DB entry when price drops (to schedule a check for that product)
-
-export const checkWatchlists = (req, res) => {
+  /* ALTERNATIVE
   const priceDrops = root.redisClient.lrange('priceChecks', 0, -1); // gets entire list of { productId, newPrice } pairs from DB
-
-  // while(root.redisClient.lpop())
 
   for(let p of priceDrops) {
     Watch.find({ productId: p.productId, targetPrice: { $gte: p.price }})
@@ -86,6 +80,7 @@ export const checkWatchlists = (req, res) => {
         console.error(err);
       })
   }
+  */
 }
 
 

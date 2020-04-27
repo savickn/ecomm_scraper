@@ -13,7 +13,7 @@ import CheckboxFilter from './CheckboxFilter';
 
 class SearchBar extends React.Component {
   
-                            /* STATE METHODS */
+                            /* LIFECYCLE METHODS */
 
   constructor(props) {
     super(props);
@@ -32,6 +32,21 @@ class SearchBar extends React.Component {
 
     this.searchRef = React.createRef();
   }
+
+  componentDidMount() {
+    if(typeof window !== undefined) {
+      const searchObj = window.localStorage.getItem(this.props.id);
+      if(searchObj) {
+        const obj = JSON.parse(searchObj);
+        console.log('searchBar localStorage --> ', obj);
+
+        //this.props.searchFunc();
+      }
+    } 
+  }
+
+
+                            /* STATE METHODS */
 
   // used to show/hide advanced search options
   toggleAdvancedSearch = (evt) => {
@@ -75,8 +90,11 @@ class SearchBar extends React.Component {
 
     let text = this.searchRef.current.value || '';
     const searchObj = Object.assign({}, this.state.search, {name: text});
-    this.props.searchFunc(searchObj);
 
+    // save to localStorage
+    window.localStorage.setItem(this.props.id, JSON.stringify(searchObj));
+
+    this.props.searchFunc(searchObj);
 
     /*if(this.searchRef.current.value) {
       this.props.simpleSearch(this.searchRef.current.value);
@@ -140,6 +158,8 @@ class SearchBar extends React.Component {
 }
 
 SearchBar.propTypes = {
+  id: PropTypes.string.isRequired, 
+
   /* search callbacks */
   simpleSearch: PropTypes.func, // basic text search
   advancedSearch: PropTypes.func, // text search with additional options

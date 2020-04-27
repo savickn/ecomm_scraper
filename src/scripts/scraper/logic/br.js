@@ -1,31 +1,11 @@
 
-const helpers = require('./helpers');
+//const helpers = require('./helpers');
 
-const scrapeBananaSale = async (page, site) => {
-  let salePageString = '';
-  
-  const gapString = 'https://www.gapcanada.ca/browse/category.do?cid=1065870&mlink=homepage,,flyout_men_Men_s_Sale&departmentRedirect=true#pageId=0&department=75';
-  const onString = 'https://oldnavy.gapcanada.ca/browse/category.do?cid=26061&mlink=11174,13518818,flyout_m_SALE&clink=13518818';
-  const brString = 'https://bananarepublic.gapcanada.ca/browse/category.do?cid=1014757&sop=true';
-  
-  switch(site) {
-    case 'GAP':
-      salePageString = gapString;
-      break;
-    case 'BR':
-      salePageString = brString;
-      break;
-    case 'ON':
-      salePageString = onString;
-      break;
-    default:
-      throw new Error('Invalid site!');
-  }
+// scrape URLs from sale page
+const scrapeBananaSale = async (page) => {
+  console.log('dfsdf');
 
-  await page.goto(salePageString, {waitUntil: 'networkidle2',  timeout: 0});
-
-  const result = await page.evaluate(async (helpers) => {
-    console.log('helpers --> ', helpers);
+  return await page.evaluate(async () => {
 
     let anchors = []; // collect product links
     let hasNextPage; // track pagination
@@ -33,14 +13,12 @@ const scrapeBananaSale = async (page, site) => {
     do {
       // maybe add 'sleep' between iterations to avoid getting rate-limited
       //await helpers.sleep(1000); // not working
+      //await setTimeout(() => {}, 2000);
 
       // pagination logic
       const nextPage = document.querySelector("a.basic-pagination__button[aria-label='Next Page']");
       console.log('nextPage --> ', nextPage);
-      /*console.log('nextpage --> ', nextPage.className);
-      for(let c of nextPage.classList) {
-        console.log('class --> ', c);
-      }*/
+
       if(nextPage) {
         hasNextPage = !nextPage.classList.contains('pagination-inactive');
       } else {
@@ -82,20 +60,28 @@ const scrapeBananaSale = async (page, site) => {
     } while(hasNextPage);
 
     return anchors;
-  }, helpers);
-  console.log('result --> ', result);
-  console.log('arr length --> ', result.length);
-  return result; 
+  });
 }
 
-const scrapeBananaProduct = async (page, url) => {
-  await page.goto(url);
+// scrape data from product page
+const scrapeBananaProduct = async (page, pageUrl) => {
+  await page.goto(pageUrl);
 
   const result = await page.evaluate(() => {
     try {
+      // represents all colors on the page as individual Products
+      let colors = [];
 
       const url = new URL(document.location.href);
       const urlParams = new URLSearchParams(window.location.search);
+
+      // handle redirect to OutOfStock page
+      // if(url === 'https://bananarepublic.gap.com/browse/OutOfStockNoResults.do') {
+      //   return [{
+      //     url: pageUrl,
+      //     outOfStock: true, 
+      //   }];
+      // }
 
       const origin = url.origin;
 
@@ -119,9 +105,6 @@ const scrapeBananaProduct = async (page, url) => {
       console.log('priceString --> ', priceString);
       const numericPrice = Number.parseFloat(priceString.match(regex)[0]); // product price as Number
       console.log('numericPrice --> ', numericPrice);
-
-      // represents all colors on the page as individual Products
-      let colors = [];
 
       // represents each section of colors (e.g. where each has its own specific price)
       const colorRadioContainers = [...document.querySelectorAll('div.swatch-price-group')];
@@ -246,6 +229,31 @@ module.exports = {
   scrapeBananaProduct, 
 }
 
+
+/*
+
+  let salePageString = '';
+  
+  const gapString = 'https://www.gapcanada.ca/browse/category.do?cid=1065870&mlink=homepage,,flyout_men_Men_s_Sale&departmentRedirect=true#pageId=0&department=75';
+  const onString = 'https://oldnavy.gapcanada.ca/browse/category.do?cid=26061&mlink=11174,13518818,flyout_m_SALE&clink=13518818';
+  const brString = 'https://bananarepublic.gapcanada.ca/browse/category.do?cid=1014757&sop=true';
+  
+  switch(site) {
+    case 'GAP':
+      salePageString = gapString;
+      break;
+    case 'BR':
+      salePageString = brString;
+      break;
+    case 'ON':
+      salePageString = onString;
+      break;
+    default:
+      throw new Error('Invalid site!');
+  }
+
+  await page.goto(salePageString, {waitUntil: 'networkidle2',  timeout: 0});
+  */
 
 
 
