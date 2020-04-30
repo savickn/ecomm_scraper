@@ -23,9 +23,9 @@ const WatchSchema = new Schema({
 
 // update 'watchlist' field of 'userId' when watch is created
 WatchSchema.pre('save', function(next) {
-  mongoose.model('User').findByIdAndUpdate(this.userId, { $push: { watchlist: this._id }})
+  mongoose.model('User').findByIdAndUpdate(this.userId, { $push: { watchlist: this._id }}, { new: true })
     .then((user) => {
-      console.log('watch pre-save success --> ', user);
+      //console.log('watch pre-save success --> ', user);
       return next();
     }).catch((err) => {
       return next(err);
@@ -34,9 +34,9 @@ WatchSchema.pre('save', function(next) {
 
 // update 'watchlist' field of 'userId' when watch is deleted
 WatchSchema.pre('remove', function(next) {
-  mongoose.model('User').findByIdAndUpdate(this.userId, { $pull: { watchlist: this._id }})
+  mongoose.model('User').findByIdAndUpdate(this.userId, { $pull: { watchlist: this._id }}, { new: true })
     .then((user) => {
-      console.log('watch pre-remove success --> ', user);
+      //console.log('watch pre-remove success --> ', user);
       return next();
     }).catch((err) => {
       return next(err);

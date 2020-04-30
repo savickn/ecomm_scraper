@@ -1,4 +1,4 @@
-//const Factory = require('rosie').Factory;
+
 import { Factory } from 'rosie'; 
 
 const UserFactory = new Factory()
@@ -7,7 +7,5 @@ const UserFactory = new Factory()
   .attr('email', ['id'], function(i) { return 'user' + i + '@example.com'; })
   .attr('password', 'password')
   .attr('role', 'user')
-  //.attr('displayPicture', ???)
-  //.attr('groups', ???)
 
 export default UserFactory;

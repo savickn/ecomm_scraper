@@ -31,6 +31,7 @@ const savePrice = (data) => {
             console.log('Added price --> ', newPrice);
             //console.log('\n newPrice --> ', newPrice.price, '\n prevPrice --> ', prevPrice.price);
 
+            // can maybe move this into mongoose 'pre' hook?
             if(!prevPrice || newPrice.price < prevPrice.price) {
               const check = { productId: newPrice.productId, price: newPrice.price, }; // add to Redis queue
               console.log('adding to queue --> ', check);

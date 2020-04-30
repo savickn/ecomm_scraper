@@ -4,7 +4,7 @@ require('@babel/register')({
   ],
   plugins: [
     "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-syntax-dynamic-import"
   ],
   presets: [
     "@babel/preset-env",

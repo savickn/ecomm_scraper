@@ -8,10 +8,8 @@ const scrapers = require('./scraper/scrape');
 const scraperTests = require('./scraper/tests');
 const promoScraper = require('./scraper/logic/promotions');
 
-// import mongoose from 'mongoose';
-// import Winston from 'winston';
-
-import { test, checkWatchlists } from './tasks/email';
+import { checkWatchlists } from './tasks/priceDropTracker';
+import { priceDropEmailer } from './tasks/sendEmailNotification';
 
 
 const logger = Winston.createLogger({
@@ -35,10 +33,16 @@ mongoose.connect('mongodb://localhost/fashionscraper_dev')
 
       console.log('cli args --> ', process.argv);
 
+      const r = await priceDropEmailer({
+        userName: user.name,
+        vendorUrl: product.url, 
+      });
+      console.log(r);
+
       //await scraperTests.testAll();
       //await scrapers.scrapeAll();
 
-      await test();
+      //await test();
       //checkWatchlists();
 
       // should either schedule the 'checkPriceDrops' script or call it directly

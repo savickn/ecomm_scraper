@@ -14,7 +14,7 @@ const PriceSchema = new Schema({
 PriceSchema.pre('save', function(next) {
   mongoose.model('Product').findByIdAndUpdate(this.productId, { $push: { 'history': this._id } }, { new: true })
     .then((product) => {
-      console.log('price pre-save success --> ', product);
+      //console.log('price pre-save success --> ', product);
       next();
     }).catch((err) => {
       console.log('price pre-save err --> ', err);
