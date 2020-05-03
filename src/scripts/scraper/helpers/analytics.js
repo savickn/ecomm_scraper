@@ -44,18 +44,13 @@ let categories = [
 ];
 
 
-const analyzeKeywords = (txt) => {
+export const analyzeKeywords = (txt) => {
   const keywords = txt.split(/-|\s/);
   //console.log('keywords --> ', keywords);
 
   // make entry into pcid-category map
 
   return keywords;
-}
-
-
-module.exports = {
-  analyzeKeywords, 
 }
 
 

@@ -1,5 +1,5 @@
 
-const redis = require('redis');
+import redis from 'async-redis';
 //redis.debug_mode = true;
 
 const client = redis.createClient();
@@ -12,4 +12,4 @@ client.on('error', function(error) {
   console.error(error);
 });
 
-module.exports = client;
+export default client;

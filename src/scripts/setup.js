@@ -1,14 +1,16 @@
 
 // used to run server-side tasks (e.g. scraping, db maintainence, emailing)
 
-const mongoose = require('mongoose');
-const Winston = require('winston');
+import mongoose from 'mongoose';
+import Winston from 'winston';
 
-const scrapers = require('./scraper/scrape');
-const scraperTests = require('./scraper/tests');
-const promoScraper = require('./scraper/logic/promotions');
+import * as scrapers from './scraper/scrape';
 
-import { checkWatchlists } from './tasks/priceDropTracker';
+//const scrapers = require('./scraper/scrape');
+//const scraperTests = require('./scraper/tests');
+//const promoScraper = require('./scraper/logic/promotions');
+
+//import { checkWatchlists } from './tasks/priceDropTracker';
 import { priceDropEmailer } from './tasks/sendEmailNotification';
 
 
@@ -34,8 +36,8 @@ mongoose.connect('mongodb://localhost/fashionscraper_dev')
       console.log('cli args --> ', process.argv);
 
       const r = await priceDropEmailer({
-        userName: user.name,
-        vendorUrl: product.url, 
+        userName: 'Nick',
+        vendorUrl: 'https://bananarepublic.gapcanada.ca/browse/product.do?pid=473206033&cid=1014857&pcid=1014757', 
       });
       console.log(r);
 

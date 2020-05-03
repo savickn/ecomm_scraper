@@ -1,5 +1,5 @@
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 /* 
@@ -19,7 +19,7 @@ Categories:
 * Parka 
 */
 
-const ProductSchema = new Schema({
+export const ProductSchema = new Schema({
   url: String, 
   name: String,
   color: String, // name of color
@@ -64,7 +64,7 @@ ProductSchema.virtual('currentDiscount').get(() => {
 
 //ProductSchema.set({'toJSON': true});
 
-module.exports = mongoose.model('Product', ProductSchema);
+export default mongoose.model('Product', ProductSchema);
 
 
 

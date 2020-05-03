@@ -1,8 +1,8 @@
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const PriceSchema = new Schema({
+export const PriceSchema = new Schema({
   date: Date,
   price: String,
   productId: {
@@ -22,4 +22,4 @@ PriceSchema.pre('save', function(next) {
     })  
 })
 
-module.exports = mongoose.model('Price', PriceSchema);
+export default mongoose.model('Price', PriceSchema);

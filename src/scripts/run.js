@@ -1,6 +1,7 @@
 require('@babel/register')({
   ignore: [
     /logic/, // cuz Babels async transpilation doesn't work with Puppeteer
+    /node_modules/
   ],
   plugins: [
     "@babel/plugin-proposal-class-properties",

@@ -1,11 +1,11 @@
 
-const PriceHistory = require('./price.model');
-const redis_client = require('../../../scripts/redis');
+import PriceHistory from './price.model';
+import redis_client from '../../../scripts/redis';
 
 const dayInMilliseconds = 60 * 60 * 24 * 1000;
 
 // used to retreive all price history via 'productId'
-const getHistory = (req, res) => {
+export const getHistory = (req, res) => {
   PriceHistory.find({productId: req.params.id}, (err, prices) => {
     if(err) return res.status(400).send(err);
     return res.status(200).json({prices});
@@ -15,7 +15,7 @@ const getHistory = (req, res) => {
 /* 
 ** create new price entries
 */
-const savePrice = (data) => {
+export const savePrice = (data) => {
   if(!data.price || !data.productId) {
     console.error('savePrice ---> Invalid arguments!');
     return;
@@ -46,9 +46,3 @@ const savePrice = (data) => {
       console.error('savePrice findOne err --> ', err);
     })
 }
-
-module.exports = {
-  savePrice, 
-  getHistory, 
-};
-

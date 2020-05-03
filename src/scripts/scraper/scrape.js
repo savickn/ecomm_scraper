@@ -1,22 +1,23 @@
 
-const puppeteer = require('puppeteer');
-const path = require('path');
-const util = require('util');
-const _ = require('lodash');
 
-const redis_client = require('../redis');
+import puppeteer from 'puppeteer';
+// const path = require('path');
+// const util = require('util');
+// const _ = require('lodash');
 
-const br = require('./logic/br');
-const gap = require('./logic/gap');
-const jcrew = require('./logic/jcrew');
+import redis_client from '../redis';
 
-const analytics = require('./logic/analytics');
-const helpers = require('./logic/helpers');
-const ProductController = require('../../server/api/Product/product.controller');
-const HistoryController = require('../../server/api/PriceHistory/price.controller');
+import br from './logic/br';
+//const gap = require('./logic/gap');
+//const jcrew = require('./logic/jcrew');
+
+import * as analytics from './helpers/analytics';
+import * as helpers from './helpers/helpers';
+import * as ProductController from '../../server/api/Product/product.controller';
+import * as HistoryController from '../../server/api/PriceHistory/price.controller';
 
 
-const scrapeAll = async () => {
+export const scrapeAll = async () => {
   const browser = await puppeteer.launch({headless: false});
   const page = await browser.newPage();
   
@@ -34,7 +35,7 @@ const scrapeAll = async () => {
   //await scrapeJC(page);
 }
 
-const scrapeBR = async (page) => {
+export const scrapeBR = async (page) => {
   // scrape links from sale page
   const url = 'https://bananarepublic.gapcanada.ca/browse/category.do?cid=1014757&sop=true';
   const links = await scrapeLinks(page, url, br.scrapeBananaSale);
@@ -45,7 +46,7 @@ const scrapeBR = async (page) => {
 }
 
 // scrape page urls from websites
-const scrapeLinks = async (page, url, linkScraper) => {
+export const scrapeLinks = async (page, url, linkScraper) => {
   await page.goto(url, {waitUntil: 'networkidle2',  timeout: 0});
 
   const links = await linkScraper(page);
@@ -67,7 +68,7 @@ const scrapeLinks = async (page, url, linkScraper) => {
 
 
 // scrape price/colors/sizes from product pages
-const scrapeProduct = async (page, links, scraper) => {
+export const scrapeProduct = async (page, links, scraper) => {
   for(let l of links) {
     await helpers.sleep(2500);
 
@@ -105,16 +106,6 @@ const scrapeProduct = async (page, links, scraper) => {
     }
   }
 }
-
-
-module.exports = {
-  scrapeAll,
-  scrapeBR,
-  //scrapeGAP,
-  //scrapeJC, 
-  scrapeProduct, 
-  scrapeLinks, 
-};
 
 
 

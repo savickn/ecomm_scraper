@@ -223,9 +223,8 @@ const scrapeBananaProduct = async (page, pageUrl) => {
   return result;
 }
 
-
 module.exports = {
-  scrapeBananaSale, 
+  scrapeBananaSale,
   scrapeBananaProduct, 
 }
 

@@ -1,10 +1,9 @@
 
-import _ from 'lodash';
 import path from 'path';
-
 import nodemailer from 'nodemailer';
-//import { EmailTemplate } from 'email-templates-v2';
 import EmailTemplate from 'email-templates';
+
+//import { EmailTemplate } from 'email-templates-v2';
 
 import config from  '../../server/config/environment';
 import env from '../../server/config/local.env';
@@ -14,7 +13,7 @@ export const priceDropEmailer = (data) => {
   try {
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 465,
+      port: 587,
       secure: false, // secure:true for port 465, secure:false for port 587
       auth: {
         user: config.secrets.serverEmail,

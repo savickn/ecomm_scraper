@@ -1,7 +1,6 @@
 
-const Product = require('./product.model');
-const Price = require('../PriceHistory/price.model');
-const _ = require('lodash');
+import Product from './product.model';
+import Price from '../PriceHistory/price.model';
 
 /*
 ** get newly recommended products for home page if logged in
@@ -41,7 +40,7 @@ const _ = require('lodash');
 /*
 ** get a collection of Products with most recent priceHistory based on search params
 */
-const searchProducts = (req, res) => {
+export const searchProducts = (req, res) => {
   const search = JSON.parse(req.query.search); // need JSON.parse??
   const pagination = JSON.parse(req.query.pagination);
 
@@ -105,7 +104,7 @@ const searchProducts = (req, res) => {
 /*
 ** get one product with full priceHistory
 */
-const getProduct = (req, res) => {
+export const getProduct = (req, res) => {
   Product.find({ 'pid': req.params.pid })
     .populate('history', Price)
     .exec((err, product) => {
@@ -118,7 +117,7 @@ const getProduct = (req, res) => {
 /*
 ** add/update product entry
 */
-const upsertProduct = (data) => {
+export const upsertProduct = (data) => {
   if(!data.url || !data.name || !data.pid || !data.color) {
     console.error('Invalid arguments!');
     return;
@@ -133,12 +132,6 @@ const upsertProduct = (data) => {
   })
 };
 
-
-module.exports = {
-  searchProducts,
-  getProduct, 
-  upsertProduct, 
-}
 
 
 /* OLD */
