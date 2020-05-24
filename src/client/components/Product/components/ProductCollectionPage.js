@@ -2,6 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { debounce } from 'lodash';
+
 
 /*
 ** Components
@@ -38,7 +40,7 @@ class ProductCollectionPage extends React.Component {
 
   filters = [
     {
-      name: 'Brand',
+      name: 'Brands',
       type: 'checkbox',
       options: ['GAP', 'BR', 'ON', 'Jcrew', "Lands' End"]
     }, 
@@ -72,9 +74,9 @@ class ProductCollectionPage extends React.Component {
   }
 
   // send AJAX request to populate products
-  searchProducts() {
+  searchProducts = debounce(() => {
     this.props.dispatch(searchProductsRequest(this.state.search, this.state.pagination));
-  }
+  })
 
 
 
@@ -111,8 +113,6 @@ class ProductCollectionPage extends React.Component {
                                   /* UI METHODS */
   
   render() {
-
-
     return (
       <React.Fragment>
         <SearchBar id='productSearch' searchFunc={this.advancedSearch} filterMap={this.filters} sortingMap={this.sortingMap} />

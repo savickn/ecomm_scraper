@@ -79,12 +79,12 @@ export const searchProducts = (req, res) => {
 
   // aggregation with pagination + count
   Product.aggregate([
-    {$match: searchObj}, 
-    {$group: {
+    { $match: searchObj }, 
+    { $group: {
       _id: "$pid", 
       assets: {$push: "$$ROOT"}
     }},
-    {$facet: {
+    { $facet: {
       paginatedResults: [{$skip: skip}, {$limit: limit}], 
       totalCount: [{$count: "count"}]
     }}, 

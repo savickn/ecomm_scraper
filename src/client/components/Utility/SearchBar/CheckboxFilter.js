@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faCircle, faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faCircle, faCheckCircle, faCaretDown, } from '@fortawesome/free-solid-svg-icons'
 
 import styles from './CheckboxFilter.scss';
 
@@ -57,9 +57,9 @@ class CheckboxFilter extends React.Component {
     const showHideFilter = this.showFilterOptions();
 
     return (
-      <React.Fragment>
-        <div className='click-cursor' onClick={this.toggleShowFilter}>
-          {this.props.filter.name}   <FontAwesomeIcon icon={faPlus} />
+      <div className={styles.checkbox}>
+        <div className={styles.expandOptionsBtn} onClick={this.toggleShowFilter}>
+          {this.props.filter.name}   <FontAwesomeIcon icon={faCaretDown} />
         </div>
         <div className={showHideFilter}>
           {this.props.filter.options && this.props.filter.options.map((option) => {
@@ -70,7 +70,7 @@ class CheckboxFilter extends React.Component {
             )
           })}
         </div>
-      </React.Fragment>
+      </div>
     )
   }
 }

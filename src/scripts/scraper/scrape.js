@@ -27,7 +27,8 @@ export const scrapeAll = async () => {
     for (let i = 0; i < msg.args().length; i++) {
       console.log(msg.args()[i]);
     }
-  }); */
+  }); 
+  */
 
   await scrapeBR(page);
   //await scrapeGAP(page);

@@ -112,22 +112,25 @@ test('test connection and verify assets', async () => {
 
 // now test features
 
-// test('checkWatchlists', async () => {
-//   const r = await checkWatchlists(client);
+// PASSING
+test('checkWatchlists', async () => {
+  await checkWatchlists(client);
 
-//   expect(r).toBe(true);
-// });
+  const l = await client.llen('emailNotifications');
+
+  expect(l).toBe(1);
+});
 
 
-test('sendEmailNotification', async () => {
-  const r = await priceDropEmailer({
-    userName: user.name,
-    vendorUrl: product.url, 
-  });
-  console.log(r);
+// PASSING
+// test('sendEmailNotification', async () => {
+//   const res = await priceDropEmailer({
+//     userName: 'Nick',
+//     vendorUrl: 'https://bananarepublic.gapcanada.ca/browse/product.do?pid=473206033&cid=1014857&pcid=1014757', 
+//   });
 
-  expect(r).toBe(true);
-})
+//   expect(res.accepted.length).toBe(1);
+// })
 
 
 

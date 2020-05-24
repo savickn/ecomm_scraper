@@ -8,9 +8,6 @@ import { priceDropEmailer } from './sendEmailNotification';
 // compare 'priceChecks' from Redis cache to watchlists and send email if necessary
 export const checkWatchlists = async (client) => {
   try { 
-    const l = await client.llen('priceChecks');
-    console.log(l);
-
     while(await client.llen('priceChecks') > 0) {
       const p = JSON.parse(await client.lpop('priceChecks'));
       console.log('price --> ', p);
@@ -22,16 +19,20 @@ export const checkWatchlists = async (client) => {
       
       for(let w of watches) {
         if(w.shouldEmail) {
-          // queue email task
-          priceDropEmailer({
+
+          const data = {
             userName: w.userId.name, 
-            email: w.userId.email, 
-            //productUrl
+            email: w.userId.email,
+            // productUrl ??
             vendorUrl: w.productId.url,
             targetPrice: w.targetPrice,
-            currentPrice: p.price,  
-          });
-          //return new Promise(priceDropEmail)
+            currentPrice: p.price, 
+          };
+
+          // queue email task
+          await client.lpush('emailNotifications', JSON.stringify(data));
+          
+          // priceDropEmailer(data);
         }
       }
     }

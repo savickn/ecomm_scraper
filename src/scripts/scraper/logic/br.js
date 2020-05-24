@@ -16,7 +16,7 @@ const scrapeBananaSale = async (page) => {
       //await setTimeout(() => {}, 2000);
 
       // pagination logic
-      const nextPage = document.querySelector("a.basic-pagination__button[aria-label='Next Page']");
+      const nextPage = document.querySelector("button[aria-label='Next Page']");
       console.log('nextPage --> ', nextPage);
 
       if(nextPage) {
@@ -39,7 +39,7 @@ const scrapeBananaSale = async (page) => {
             clearInterval(timer);
             resolve();
           }
-        }, 30);
+        }, 35);
       });
 
       // scraping logic
@@ -192,7 +192,7 @@ const scrapeBananaProduct = async (page, pageUrl) => {
             color: colorName,
 
             imageSrc: origin + colorImage, 
-            colorSrc: origin + colorThumb, 
+            colorSrc: colorThumb, 
 
             sizes,
           });

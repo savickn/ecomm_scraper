@@ -3,12 +3,11 @@ import path from 'path';
 import nodemailer from 'nodemailer';
 import EmailTemplate from 'email-templates';
 
-//import { EmailTemplate } from 'email-templates-v2';
-
 import config from  '../../server/config/environment';
 import env from '../../server/config/local.env';
 
 // create an email to notify User of a price drop for a watchlist Product
+// WORKING
 export const priceDropEmailer = (data) => {
   try {
     const transporter = nodemailer.createTransport({
@@ -52,6 +51,18 @@ export const priceDropEmailer = (data) => {
   }
 }
 
+// basically send the emails
+export const sendEmailTask = async (client) => {
+  try { 
+    while(await client.llen('emailNotifications') > 0) {
+      const data = JSON.parse(await client.lpop('emailNotifications'));
+      priceDropEmailer(data);
+    }
+  } catch(error) {
+    console.error('checkWatchlists error --> ', error);
+  }
+}
+
   /* ALTERNATIVE
   const priceDrops = root.redisClient.lrange('priceChecks', 0, -1); // gets entire list of { productId, newPrice } pairs from DB
 
@@ -82,10 +93,9 @@ export const priceDropEmailer = (data) => {
   }
   */
 
-
-
-
 /* OLD... using email-templates-v2 */
+
+//import { EmailTemplate } from 'email-templates-v2';
 
 // // create an email to notify User of a price drop for a watchlist Product
 // export const priceDropEmailer = (data) => {

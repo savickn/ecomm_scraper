@@ -83,8 +83,15 @@ export class Pagination extends Component {
     return nums;
   }
 
+  // checks if the Pagination menu should render
+  shouldRender = () => {
+    if(!this.props.collectionSize) return false;
+    if(this.props.collectionSize <= this.props.pageSize) return false;
+    return true; 
+  }
+
   render() {
-    if(!this.props.collectionSize) return <div></div>
+    if(!this.shouldRender()) return <div></div>
 
     console.log('pagination --> ', this.props);
 

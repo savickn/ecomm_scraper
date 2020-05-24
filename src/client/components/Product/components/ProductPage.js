@@ -65,20 +65,20 @@ class ProductPage extends React.Component {
       <React.Fragment>
         <div className={styles.infoContainer}>
           <div className={styles.imageSidebar}>
-            <img src={noPic} width="150" height="150" />
+            <img src={noPic} width="350" height="350" />
             <div> Price: {activeProduct.currentPrice} </div>
             <a href={activeProduct.url}> Buy Now! </a>
           </div>
 
           <div className={styles.info}>
-            <div className='colors'> 
+            <div className={styles.colors}> 
               {products && products.map((p) => {
                 return (
                   <div onClick={this.selectColor}>{p.color}</div>
                 )
               })}
             </div>
-            <div className='sizes'>
+            <div className={styles.sizes}>
               {activeProduct.sizes && activeProduct.sizes.map((size) => {
                 return (
                   <div>{size}</div>

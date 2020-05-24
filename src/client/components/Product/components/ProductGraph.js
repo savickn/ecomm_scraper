@@ -105,7 +105,11 @@ class ProductGraph extends React.Component {
     const min = Math.min(...prices);
     
     const minmaxDiff = max - min;
-    const variance = 0.2 * minmaxDiff;
+    let variance = 0.2 * minmaxDiff;
+
+    if(variance < 10) {
+      variance = 10;
+    }
 
     const yMin = Math.abs(min - variance);
     const yMax = max + variance;

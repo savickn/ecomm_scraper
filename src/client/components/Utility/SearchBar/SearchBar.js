@@ -141,7 +141,7 @@ class SearchBar extends React.Component {
         </div>
         
         <div id='advanced-search-collapsable' className={this.state.advancedSearch ? styles.showCollapsable : styles.hideCollapsable}>
-          <div id='filters'>
+          <div className={styles.filters}>
             {this.props.filterMap && this.props.filterMap.map((filter) => {
               if(filter.type === 'checkbox') {
                 return <CheckboxFilter filter={filter} checkboxChanged={this.handleCheckboxChange}/>

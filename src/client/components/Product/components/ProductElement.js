@@ -22,7 +22,7 @@ class ProductElement extends React.Component {
     //console.log('productElement styles --> ', styles);
 
     const product = this.props.product;
-    const { url, imageSrc, name, } = this.props.product.assets[0];
+    const { url, imageSrc, name, } = this.props.product.assets[0]; 
     const img = /*imageSrc ||*/ noPic;
 
     return product ? (
