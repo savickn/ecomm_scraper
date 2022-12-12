@@ -41,7 +41,7 @@
     "email-templates": "^7.0.4",
     "email-templates-v2": "2.0.3",
     "errorhandler": "1.5.1",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "express-jwt": "5.3.1",
     "express-session": "1.17.0",
     "history": "4.10.1",
